@@ -2696,297 +2696,288 @@
             }
         }
 
-        // 持久化留言管理系统
+        // 简化但可靠的留言管理系统
         class CommentManager {
             constructor() {
                 this.comments = [];
-                this.maxComments = 100; // 增加留言数量限制
-                this.storageKey = 'henry_wmc777_comments';
+                this.maxComments = 50;
+                this.storageKey = 'wmc777_comments';
+                console.log('CommentManager initialized');
                 this.init();
             }
             
             init() {
-                this.loadComments();
-                this.renderComments();
-                this.addInfoUI();
+                try {
+                    this.loadComments();
+                    this.renderComments();
+                    this.addInfoUI();
+                    console.log('CommentManager init completed');
+                } catch (error) {
+                    console.error('CommentManager init failed:', error);
+                }
             }
             
             // 生成唯一ID
             generateId() {
-                return Date.now().toString(36) + Math.random().toString(36).substr(2);
+                return 'comment_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             }
             
-            // 尝试多种存储方式
+            // 保存留言到URL片段
             saveComments() {
-                const dataToSave = JSON.stringify(this.comments);
-                let saved = false;
-                let method = '';
-                
-                // 尝试sessionStorage
                 try {
-                    if (window.sessionStorage) {
-                        sessionStorage.setItem(this.storageKey, dataToSave);
-                        saved = true;
-                        method = 'SessionStorage';
-                    }
-                } catch (e) {
-                    console.log('SessionStorage not available:', e);
+                    // 方法1: 尝试使用URL片段保存数据
+                    const data = btoa(encodeURIComponent(JSON.stringify(this.comments.slice(0, 10)))); // 只保存最新10条
+                    const newUrl = window.location.pathname + window.location.search + '#data=' + data;
+                    
+                    // 不使用pushState，避免影响浏览历史
+                    window.location.hash = 'data=' + data;
+                    console.log('Comments saved to URL fragment');
+                    return { saved: true, method: 'URL Fragment' };
+                } catch (error) {
+                    console.log('URL fragment save failed:', error);
+                    return { saved: false, method: 'None' };
                 }
-                
-                // 如果sessionStorage失败，尝试cookie存储（压缩版）
-                if (!saved) {
-                    try {
-                        // 只保存最新20条留言到cookie
-                        const recentComments = this.comments.slice(0, 20).map(comment => ({
-                            i: comment.id,
-                            n: comment.name,
-                            t: comment.text.substring(0, 100), // 限制文本长度
-                            d: comment.date
-                        }));
-                        
-                        const compressedData = JSON.stringify(recentComments);
-                        if (compressedData.length < 3000) { // Cookie大小限制
-                            document.cookie = `${this.storageKey}=${encodeURIComponent(compressedData)}; path=/; max-age=${30*24*60*60}`; // 30天
-                            saved = true;
-                            method = 'Cookie';
-                        }
-                    } catch (e) {
-                        console.log('Cookie storage failed:', e);
-                    }
-                }
-                
-                return { saved, method };
             }
             
-            // 加载留言
+            // 从URL片段加载留言
             loadComments() {
-                let loaded = false;
-                let method = '';
-                
-                // 尝试从sessionStorage加载
                 try {
-                    if (window.sessionStorage) {
-                        const data = sessionStorage.getItem(this.storageKey);
-                        if (data) {
-                            this.comments = JSON.parse(data);
-                            loaded = true;
-                            method = 'SessionStorage';
+                    // 从URL片段读取数据
+                    const hash = window.location.hash;
+                    if (hash && hash.startsWith('#data=')) {
+                        const data = hash.substring(6); // 移除 '#data='
+                        const decoded = JSON.parse(decodeURIComponent(atob(data)));
+                        
+                        if (Array.isArray(decoded) && decoded.length > 0) {
+                            this.comments = decoded;
+                            console.log('Comments loaded from URL fragment:', this.comments.length);
+                            return { loaded: true, method: 'URL Fragment' };
                         }
                     }
-                } catch (e) {
-                    console.log('Failed to load from sessionStorage:', e);
+                } catch (error) {
+                    console.log('Failed to load from URL fragment:', error);
                 }
                 
-                // 如果sessionStorage失败，尝试从cookie加载
-                if (!loaded) {
-                    try {
-                        const cookies = document.cookie.split(';');
-                        for (let cookie of cookies) {
-                            const [name, value] = cookie.trim().split('=');
-                            if (name === this.storageKey) {
-                                const compressedData = JSON.parse(decodeURIComponent(value));
-                                this.comments = compressedData.map(c => ({
-                                    id: c.i,
-                                    name: c.n,
-                                    email: '',
-                                    text: c.t,
-                                    date: c.d
-                                }));
-                                loaded = true;
-                                method = 'Cookie';
-                                break;
-                            }
-                        }
-                    } catch (e) {
-                        console.log('Failed to load from cookie:', e);
-                    }
-                }
-                
-                if (!loaded) {
-                    this.comments = [];
-                    method = 'Memory';
-                }
-                
-                console.log(`Comments loaded from ${method}: ${this.comments.length} items`);
-                return { loaded, method };
+                // 如果没有数据，使用空数组
+                this.comments = [];
+                console.log('Using empty comments array');
+                return { loaded: false, method: 'Memory' };
             }
             
             // 添加留言
             addComment(name, email, text) {
-                // 转义HTML防止XSS
-                const escapeHtml = (unsafe) => {
-                    return unsafe
-                        .replace(/&/g, "&amp;")
-                        .replace(/</g, "&lt;")
-                        .replace(/>/g, "&gt;")
-                        .replace(/"/g, "&quot;")
-                        .replace(/'/g, "&#039;");
-                };
+                try {
+                    // 转义HTML防止XSS
+                    const escapeHtml = (unsafe) => {
+                        return unsafe
+                            .replace(/&/g, "&amp;")
+                            .replace(/</g, "&lt;")
+                            .replace(/>/g, "&gt;")
+                            .replace(/"/g, "&quot;")
+                            .replace(/'/g, "&#039;");
+                    };
 
-                const comment = {
-                    id: this.generateId(),
-                    name: escapeHtml(name),
-                    email: escapeHtml(email),
-                    text: escapeHtml(text),
-                    date: new Date().toISOString()
-                };
-                
-                // 添加到列表开头
-                this.comments.unshift(comment);
-                
-                // 限制留言数量
-                if (this.comments.length > this.maxComments) {
-                    this.comments = this.comments.slice(0, this.maxComments);
+                    const comment = {
+                        id: this.generateId(),
+                        name: escapeHtml(name),
+                        email: escapeHtml(email),
+                        text: escapeHtml(text),
+                        date: new Date().toISOString()
+                    };
+                    
+                    // 添加到列表开头
+                    this.comments.unshift(comment);
+                    
+                    // 限制留言数量
+                    if (this.comments.length > this.maxComments) {
+                        this.comments = this.comments.slice(0, this.maxComments);
+                    }
+                    
+                    console.log('Comment added:', comment);
+                    
+                    // 保存到URL
+                    const saveResult = this.saveComments();
+                    
+                    // 重新渲染
+                    this.renderComments();
+                    this.updateStats();
+                    
+                    return true;
+                } catch (error) {
+                    console.error('Failed to add comment:', error);
+                    return false;
                 }
-                
-                // 尝试保存
-                const saveResult = this.saveComments();
-                
-                this.renderComments();
-                this.updateStats();
-                
-                return saveResult;
+            }
+            
+            // 删除留言
+            deleteComment(commentId) {
+                try {
+                    const initialLength = this.comments.length;
+                    this.comments = this.comments.filter(comment => comment.id !== commentId);
+                    
+                    if (this.comments.length < initialLength) {
+                        console.log('Comment deleted:', commentId);
+                        
+                        // 保存变更
+                        this.saveComments();
+                        
+                        // 重新渲染
+                        this.renderComments();
+                        this.updateStats();
+                        
+                        return true;
+                    }
+                    
+                    return false;
+                } catch (error) {
+                    console.error('Failed to delete comment:', error);
+                    return false;
+                }
             }
             
             // 渲染留言
             renderComments() {
-                const commentsList = document.getElementById('comments-list');
-                if (!commentsList) {
-                    console.error('Comments list element not found');
-                    return;
-                }
-                
-                // 清除之前的动态留言
-                const existingDynamic = commentsList.querySelectorAll('.dynamic-comment');
-                existingDynamic.forEach(el => el.remove());
-                
-                if (this.comments.length === 0) return;
-                
-                // 找到插入位置（在固定留言之前）
-                const firstFixedComment = commentsList.querySelector('.comment-item:not(.dynamic-comment)');
-                
-                // 渲染所有留言
-                this.comments.forEach((comment, index) => {
-                    const commentElement = document.createElement('div');
-                    commentElement.className = 'comment-item dynamic-comment';
-                    commentElement.setAttribute('data-comment-id', comment.id);
-                    
-                    // 根据时间设置不同样式
-                    const commentTime = new Date(comment.date);
-                    const now = new Date();
-                    const timeDiff = now - commentTime;
-                    const isRecent = timeDiff < 24 * 60 * 60 * 1000; // 24小时内
-                    
-                    if (isRecent) {
-                        commentElement.style.borderLeft = '4px solid #10b981';
-                    } else {
-                        commentElement.style.borderLeft = '4px solid #3b82f6';
+                try {
+                    const commentsList = document.getElementById('comments-list');
+                    if (!commentsList) {
+                        console.error('Comments list element not found');
+                        return;
                     }
                     
-                    // 格式化日期
-                    const date = new Date(comment.date);
-                    const dateStr = `${date.toLocaleDateString('zh-CN')} | ${date.toLocaleDateString('en-US')}`;
+                    // 清除之前的动态留言
+                    const existingDynamic = commentsList.querySelectorAll('.dynamic-comment');
+                    existingDynamic.forEach(el => el.remove());
                     
-                    const recentBadge = isRecent ? '<span style="color: #10b981; font-size: 0.8rem;">🆕</span>' : '<span style="color: #3b82f6; font-size: 0.8rem;">💭</span>';
-                    
-                    const deleteText = currentLanguage === 'zh' ? '删除' : 'Delete';
-                    
-                    commentElement.innerHTML = `
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                            <div class="comment-author">${comment.name} ${recentBadge}</div>
-                            <button onclick="commentManager.deleteComment('${comment.id}')" 
-                                    style="background: none; border: none; color: #ef4444; font-size: 0.8rem; cursor: pointer; padding: 0.2rem 0.5rem; border-radius: 4px; opacity: 0.7; transition: all 0.2s ease;"
-                                    onmouseover="this.style.opacity='1'; this.style.background='rgba(239, 68, 70, 0.1)'"
-                                    onmouseout="this.style.opacity='0.7'; this.style.background='none'"
-                                    title="${deleteText}">
-                                🗑️
-                            </button>
-                        </div>
-                        <div class="comment-date">${dateStr}</div>
-                        <div class="comment-text">${comment.text}</div>
-                    `;
-                    
-                    // 插入到正确位置
-                    if (firstFixedComment) {
-                        commentsList.insertBefore(commentElement, firstFixedComment);
-                    } else {
-                        commentsList.appendChild(commentElement);
+                    if (this.comments.length === 0) {
+                        console.log('No comments to render');
+                        return;
                     }
-                });
-                
-                // 滚动到最新留言
-                if (this.comments.length > 0) {
-                    const firstDynamicComment = commentsList.querySelector('.dynamic-comment');
-                    if (firstDynamicComment) {
-                        firstDynamicComment.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    // 找到插入位置（在固定留言之前）
+                    const firstFixedComment = commentsList.querySelector('.comment-item:not(.dynamic-comment)');
+                    
+                    // 渲染所有留言
+                    this.comments.forEach((comment, index) => {
+                        const commentElement = document.createElement('div');
+                        commentElement.className = 'comment-item dynamic-comment';
+                        commentElement.setAttribute('data-comment-id', comment.id);
                         
-                        // 高亮最新留言
-                        const commentTime = new Date(this.comments[0].date);
+                        // 根据时间设置不同样式
+                        const commentTime = new Date(comment.date);
                         const now = new Date();
-                        if (now - commentTime < 10000) { // 10秒内的留言
-                            firstDynamicComment.style.background = 'rgba(16, 185, 129, 0.1)';
+                        const timeDiff = now - commentTime;
+                        const isRecent = timeDiff < 24 * 60 * 60 * 1000; // 24小时内
+                        
+                        if (isRecent) {
+                            commentElement.style.borderLeft = '4px solid #10b981';
+                        } else {
+                            commentElement.style.borderLeft = '4px solid #3b82f6';
+                        }
+                        
+                        // 格式化日期
+                        const date = new Date(comment.date);
+                        const dateStr = `${date.toLocaleDateString('zh-CN')} | ${date.toLocaleDateString('en-US')}`;
+                        
+                        const recentBadge = isRecent ? '<span style="color: #10b981; font-size: 0.8rem;">🆕</span>' : '<span style="color: #3b82f6; font-size: 0.8rem;">💭</span>';
+                        
+                        const deleteText = currentLanguage === 'zh' ? '删除' : 'Delete';
+                        
+                        commentElement.innerHTML = `
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                                <div class="comment-author">${comment.name} ${recentBadge}</div>
+                                <button onclick="deleteComment('${comment.id}')" 
+                                        style="background: none; border: none; color: #ef4444; font-size: 0.8rem; cursor: pointer; padding: 0.2rem 0.5rem; border-radius: 4px; opacity: 0.7; transition: all 0.2s ease;"
+                                        onmouseover="this.style.opacity='1'; this.style.background='rgba(239, 68, 70, 0.1)'"
+                                        onmouseout="this.style.opacity='0.7'; this.style.background='none'"
+                                        title="${deleteText}">
+                                    🗑️
+                                </button>
+                            </div>
+                            <div class="comment-date">${dateStr}</div>
+                            <div class="comment-text">${comment.text}</div>
+                        `;
+                        
+                        // 插入到正确位置
+                        if (firstFixedComment) {
+                            commentsList.insertBefore(commentElement, firstFixedComment);
+                        } else {
+                            commentsList.appendChild(commentElement);
+                        }
+                    });
+                    
+                    console.log('Rendered', this.comments.length, 'comments');
+                    
+                    // 滚动到最新留言
+                    if (this.comments.length > 0) {
+                        const firstDynamicComment = commentsList.querySelector('.dynamic-comment');
+                        if (firstDynamicComment) {
                             setTimeout(() => {
-                                firstDynamicComment.style.background = '';
-                            }, 3000);
+                                firstDynamicComment.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }, 100);
+                            
+                            // 高亮最新留言
+                            const commentTime = new Date(this.comments[0].date);
+                            const now = new Date();
+                            if (now - commentTime < 10000) { // 10秒内的留言
+                                firstDynamicComment.style.background = 'rgba(16, 185, 129, 0.1)';
+                                setTimeout(() => {
+                                    firstDynamicComment.style.background = '';
+                                }, 3000);
+                            }
                         }
                     }
+                } catch (error) {
+                    console.error('Failed to render comments:', error);
                 }
             }
             
             // 更新统计信息
             updateStats() {
-                const statsElement = document.getElementById('comment-stats');
-                if (statsElement) {
-                    const countText = currentLanguage === 'zh' ? '条留言' : 'comments';
-                    
-                    // 检查存储状态
-                    let storageInfo = '';
-                    try {
-                        if (window.sessionStorage && sessionStorage.getItem(this.storageKey)) {
-                            storageInfo = currentLanguage === 'zh' ? '已保存' : 'Saved';
-                        } else {
-                            const cookies = document.cookie.split(';');
-                            const hasCookie = cookies.some(cookie => cookie.trim().startsWith(this.storageKey));
-                            storageInfo = hasCookie ? 
-                                (currentLanguage === 'zh' ? '已保存(简化)' : 'Saved(Lite)') : 
-                                (currentLanguage === 'zh' ? '临时存储' : 'Temporary');
-                        }
-                    } catch (e) {
-                        storageInfo = currentLanguage === 'zh' ? '临时存储' : 'Temporary';
+                try {
+                    const statsElement = document.getElementById('comment-stats');
+                    if (statsElement) {
+                        const countText = currentLanguage === 'zh' ? '条留言' : 'comments';
+                        const storageInfo = currentLanguage === 'zh' ? '已保存到URL' : 'Saved in URL';
+                        
+                        statsElement.innerHTML = `
+                            <span style="color: #6b7280; font-size: 0.8rem;">
+                                💭 ${this.comments.length} ${countText} | ${storageInfo}
+                            </span>
+                        `;
                     }
-                    
-                    statsElement.innerHTML = `
-                        <span style="color: #6b7280; font-size: 0.8rem;">
-                            💭 ${this.comments.length} ${countText} | ${storageInfo}
-                        </span>
-                    `;
+                } catch (error) {
+                    console.error('Failed to update stats:', error);
                 }
             }
             
             // 添加信息UI
             addInfoUI() {
-                const commentForm = document.querySelector('.comment-form');
-                if (!commentForm) {
-                    console.error('Comment form not found');
-                    return;
-                }
-                
-                const infoDiv = document.createElement('div');
-                infoDiv.innerHTML = `
-                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(16, 185, 129, 0.05); border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.1);">
-                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-                            <div id="comment-stats">
-                                <span style="color: #6b7280; font-size: 0.8rem;">💭 Loading...</span>
-                            </div>
-                            <div style="font-size: 0.75rem; color: #6b7280; text-align: right;">
-                                <span data-zh="💡 留言会自动保存，刷新页面后仍可查看" data-en="💡 Comments auto-save and persist after refresh">💡 留言会自动保存，刷新页面后仍可查看</span>
+                try {
+                    const commentForm = document.querySelector('.comment-form');
+                    if (!commentForm) {
+                        console.error('Comment form not found');
+                        return;
+                    }
+                    
+                    const infoDiv = document.createElement('div');
+                    infoDiv.innerHTML = `
+                        <div style="margin-top: 1rem; padding: 1rem; background: rgba(255, 193, 7, 0.1); border-radius: 8px; border: 1px solid rgba(255, 193, 7, 0.3);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                                <div id="comment-stats">
+                                    <span style="color: #6b7280; font-size: 0.8rem;">💭 Loading...</span>
+                                </div>
+                                <div style="font-size: 0.75rem; color: #856404; text-align: right;">
+                                    <span data-zh="⚠️ 留言保存在URL中，分享链接可保留留言" data-en="⚠️ Comments saved in URL, sharing link preserves comments">⚠️ 留言保存在URL中，分享链接可保留留言</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `;
-                
-                commentForm.appendChild(infoDiv);
-                this.updateStats();
+                    `;
+                    
+                    commentForm.appendChild(infoDiv);
+                    this.updateStats();
+                } catch (error) {
+                    console.error('Failed to add info UI:', error);
+                }
             }
         }
         
