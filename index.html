@@ -1556,10 +1556,10 @@
                             </div>
                         </div>
                         <div class="carousel-slide">
-                            <img src="https://pfst.cf2.poecdn.net/base/image/90bc4be8633ab0b641eff998609747c01c8f1e952e0a741647756ab158df8144?w=2000&h=2500" alt="Henry（16号）与甄17一起跑步 - 并肩作战">
+                            <img src="https://pfst.cf2.poecdn.net/base/image/90bc4be8633ab0b641eff998609747c01c8f1e952e0a741647756ab158df8144?w=2000&h=2500" alt="Henry和Yuki一起跑步 - 并肩作战">
                             <div class="carousel-caption">
                                 <h3 data-zh="并肩作战" data-en="Side by Side">并肩作战</h3>
-                                <p data-zh="Henry（16号）与甄17的友谊见证" data-en="Witness to the friendship between Henry (#16) and Zhen 17">Henry（16号）与甄17的友谊见证</p>
+                                <p data-zh="Henry和Yuki的友谊见证" data-en="Witness to the friendship between Henry and Yuki">Henry和Yuki的友谊见证</p>
                             </div>
                         </div>
                         <div class="carousel-slide">
@@ -2696,6 +2696,382 @@
             }
         }
 
+        // 高级留言存储管理系统
+        class AdvancedCommentManager {
+            constructor() {
+                this.dbName = 'HenryWMC777Comments';
+                this.dbVersion = 1;
+                this.storeName = 'comments';
+                this.fallbackKey = 'henry_wmc777_comments_fallback';
+                this.db = null;
+                this.isIndexedDBAvailable = false;
+                this.comments = [];
+                this.init();
+            }
+            
+            async init() {
+                await this.initIndexedDB();
+                await this.loadComments();
+                this.renderComments();
+                this.addDataManagementUI();
+            }
+            
+            // 初始化IndexedDB
+            async initIndexedDB() {
+                return new Promise((resolve) => {
+                    try {
+                        if (!window.indexedDB) {
+                            console.log('IndexedDB not supported');
+                            resolve(false);
+                            return;
+                        }
+                        
+                        const request = indexedDB.open(this.dbName, this.dbVersion);
+                        
+                        request.onerror = () => {
+                            console.log('IndexedDB open failed');
+                            resolve(false);
+                        };
+                        
+                        request.onsuccess = (event) => {
+                            this.db = event.target.result;
+                            this.isIndexedDBAvailable = true;
+                            console.log('IndexedDB initialized successfully');
+                            resolve(true);
+                        };
+                        
+                        request.onupgradeneeded = (event) => {
+                            const db = event.target.result;
+                            if (!db.objectStoreNames.contains(this.storeName)) {
+                                const store = db.createObjectStore(this.storeName, { keyPath: 'id' });
+                                store.createIndex('date', 'date', { unique: false });
+                            }
+                        };
+                    } catch (error) {
+                        console.log('IndexedDB initialization error:', error);
+                        resolve(false);
+                    }
+                });
+            }
+            
+            // 从IndexedDB加载留言
+            async loadFromIndexedDB() {
+                if (!this.isIndexedDBAvailable || !this.db) return [];
+                
+                return new Promise((resolve) => {
+                    try {
+                        const transaction = this.db.transaction([this.storeName], 'readonly');
+                        const store = transaction.objectStore(this.storeName);
+                        const request = store.getAll();
+                        
+                        request.onsuccess = () => {
+                            const comments = request.result || [];
+                            // 按日期倒序排列
+                            comments.sort((a, b) => new Date(b.date) - new Date(a.date));
+                            resolve(comments);
+                        };
+                        
+                        request.onerror = () => {
+                            console.log('Failed to load from IndexedDB');
+                            resolve([]);
+                        };
+                    } catch (error) {
+                        console.log('IndexedDB read error:', error);
+                        resolve([]);
+                    }
+                });
+            }
+            
+            // 保存到IndexedDB
+            async saveToIndexedDB(comment) {
+                if (!this.isIndexedDBAvailable || !this.db) return false;
+                
+                return new Promise((resolve) => {
+                    try {
+                        const transaction = this.db.transaction([this.storeName], 'readwrite');
+                        const store = transaction.objectStore(this.storeName);
+                        const request = store.put(comment);
+                        
+                        request.onsuccess = () => {
+                            resolve(true);
+                        };
+                        
+                        request.onerror = () => {
+                            console.log('Failed to save to IndexedDB');
+                            resolve(false);
+                        };
+                    } catch (error) {
+                        console.log('IndexedDB write error:', error);
+                        resolve(false);
+                    }
+                });
+            }
+            
+            // 备用存储方案
+            saveToFallback(comments) {
+                try {
+                    // 压缩数据
+                    const compressedComments = comments.slice(0, 50).map(comment => ({
+                        i: comment.id,
+                        n: comment.name,
+                        t: comment.text,
+                        d: comment.date
+                    }));
+                    
+                    if (typeof(Storage) !== "undefined" && sessionStorage) {
+                        sessionStorage.setItem(this.fallbackKey, JSON.stringify(compressedComments));
+                        return 'session';
+                    }
+                    
+                    // Cookie存储最新10条
+                    const cookieComments = compressedComments.slice(0, 10);
+                    const cookieData = JSON.stringify(cookieComments);
+                    if (cookieData.length < 3000) { // 确保不超过cookie限制
+                        document.cookie = `${this.fallbackKey}=${encodeURIComponent(cookieData)}; path=/; max-age=2592000`; // 30天
+                        return 'cookie';
+                    }
+                    
+                    return false;
+                } catch (error) {
+                    console.log('Fallback storage failed:', error);
+                    return false;
+                }
+            }
+            
+            loadFromFallback() {
+                try {
+                    // 尝试从sessionStorage读取
+                    if (typeof(Storage) !== "undefined" && sessionStorage) {
+                        const data = sessionStorage.getItem(this.fallbackKey);
+                        if (data) {
+                            const compressed = JSON.parse(data);
+                            return compressed.map(c => ({
+                                id: c.i,
+                                name: c.n,
+                                email: '',
+                                text: c.t,
+                                date: c.d
+                            }));
+                        }
+                    }
+                    
+                    // 尝试从cookie读取
+                    const cookies = document.cookie.split(';');
+                    for (let cookie of cookies) {
+                        const [name, value] = cookie.trim().split('=');
+                        if (name === this.fallbackKey) {
+                            const compressed = JSON.parse(decodeURIComponent(value));
+                            return compressed.map(c => ({
+                                id: c.i,
+                                name: c.n,
+                                email: '',
+                                text: c.t,
+                                date: c.d
+                            }));
+                        }
+                    }
+                } catch (error) {
+                    console.log('Fallback load failed:', error);
+                }
+                return [];
+            }
+            
+            async loadComments() {
+                // 优先从IndexedDB加载
+                if (this.isIndexedDBAvailable) {
+                    this.comments = await this.loadFromIndexedDB();
+                    if (this.comments.length > 0) {
+                        console.log(`Loaded ${this.comments.length} comments from IndexedDB`);
+                        return;
+                    }
+                }
+                
+                // 从备用存储加载
+                this.comments = this.loadFromFallback();
+                console.log(`Loaded ${this.comments.length} comments from fallback storage`);
+            }
+            
+            async addComment(name, email, text) {
+                const comment = {
+                    id: Date.now() + Math.random(),
+                    name: name,
+                    email: email,
+                    text: text,
+                    date: new Date().toISOString()
+                };
+                
+                let success = false;
+                let storageType = 'none';
+                
+                // 尝试保存到IndexedDB
+                if (this.isIndexedDBAvailable) {
+                    success = await this.saveToIndexedDB(comment);
+                    if (success) {
+                        this.comments.unshift(comment);
+                        storageType = 'indexed';
+                    }
+                }
+                
+                // 备用存储
+                if (!success) {
+                    this.comments.unshift(comment);
+                    // 限制内存中的评论数量
+                    if (this.comments.length > 100) {
+                        this.comments = this.comments.slice(0, 100);
+                    }
+                    storageType = this.saveToFallback(this.comments);
+                }
+                
+                this.renderComments();
+                this.updateStats();
+                
+                return { success: success || storageType !== false, storageType };
+            }
+            
+            renderComments() {
+                const commentsList = document.getElementById('comments-list');
+                
+                // 清除之前的动态留言
+                const existingDynamic = commentsList.querySelectorAll('.dynamic-comment');
+                existingDynamic.forEach(el => el.remove());
+                
+                if (this.comments.length === 0) return;
+                
+                const h4Element = commentsList.querySelector('h4');
+                const firstFixedComment = commentsList.querySelector('.comment-item:not(.dynamic-comment)');
+                
+                // 渲染所有留言
+                this.comments.forEach((comment, index) => {
+                    const commentElement = document.createElement('div');
+                    commentElement.className = 'comment-item dynamic-comment';
+                    
+                    // 根据存储类型设置样式
+                    if (this.isIndexedDBAvailable && index < this.comments.length) {
+                        commentElement.style.borderLeft = '4px solid #10b981';
+                    } else {
+                        commentElement.style.borderLeft = '4px solid #3b82f6';
+                    }
+                    
+                    const dateStr = new Date(comment.date).toLocaleDateString('zh-CN') + ' | ' + new Date(comment.date).toLocaleDateString('en-US');
+                    
+                    commentElement.innerHTML = `
+                        <div class="comment-author">${comment.name} <span style="color: #10b981; font-size: 0.8rem;">${this.isIndexedDBAvailable ? '💾' : '📝'}</span></div>
+                        <div class="comment-date">${dateStr}</div>
+                        <div class="comment-text">${comment.text}</div>
+                    `;
+                    
+                    if (firstFixedComment) {
+                        commentsList.insertBefore(commentElement, firstFixedComment);
+                    } else {
+                        commentsList.appendChild(commentElement);
+                    }
+                });
+            }
+            
+            // 导出留言数据
+            exportComments() {
+                const data = {
+                    exportDate: new Date().toISOString(),
+                    totalComments: this.comments.length,
+                    comments: this.comments
+                };
+                
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `henry-wmc777-comments-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showNotification(currentLanguage === 'zh' ? '留言数据已导出！' : 'Comments exported successfully!', 'success');
+            }
+            
+            // 导入留言数据
+            importComments(file) {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (data.comments && Array.isArray(data.comments)) {
+                            // 合并导入的留言
+                            const existingIds = new Set(this.comments.map(c => c.id));
+                            const newComments = data.comments.filter(c => !existingIds.has(c.id));
+                            
+                            for (const comment of newComments) {
+                                if (this.isIndexedDBAvailable) {
+                                    await this.saveToIndexedDB(comment);
+                                }
+                            }
+                            
+                            this.comments = [...newComments, ...this.comments]
+                                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                                .slice(0, 200); // 限制总数
+                            
+                            this.saveToFallback(this.comments);
+                            this.renderComments();
+                            this.updateStats();
+                            
+                            showNotification(currentLanguage === 'zh' ? 
+                                `成功导入 ${newComments.length} 条新留言！` : 
+                                `Successfully imported ${newComments.length} new comments!`, 'success');
+                        } else {
+                            throw new Error('Invalid file format');
+                        }
+                    } catch (error) {
+                        showNotification(currentLanguage === 'zh' ? '导入失败，文件格式错误' : 'Import failed, invalid file format', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            }
+            
+            // 更新统计信息
+            updateStats() {
+                const statsElement = document.getElementById('comment-stats');
+                if (statsElement) {
+                    const storageType = this.isIndexedDBAvailable ? 'IndexedDB' : 'Fallback';
+                    statsElement.innerHTML = `
+                        <span style="color: #6b7280; font-size: 0.8rem;">
+                            💾 ${this.comments.length} ${currentLanguage === 'zh' ? '条留言' : 'comments'} | 
+                            ${currentLanguage === 'zh' ? '存储方式' : 'Storage'}: ${storageType}
+                        </span>
+                    `;
+                }
+            }
+            
+            // 添加数据管理UI
+            addDataManagementUI() {
+                const commentForm = document.querySelector('.comment-form');
+                if (!commentForm) return;
+                
+                const managementDiv = document.createElement('div');
+                managementDiv.innerHTML = `
+                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(59, 130, 246, 0.05); border-radius: 8px; border: 1px solid rgba(59, 130, 246, 0.1);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                            <div id="comment-stats">
+                                <span style="color: #6b7280; font-size: 0.8rem;">💾 Loading...</span>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                <button onclick="commentManager.exportComments()" style="padding: 0.5rem 1rem; font-size: 0.8rem; background: #10b981; border-radius: 6px;" data-zh="📤 导出留言" data-en="📤 Export">📤 导出留言</button>
+                                <label style="padding: 0.5rem 1rem; font-size: 0.8rem; background: #3b82f6; border-radius: 6px; cursor: pointer;" data-zh="📥 导入留言" data-en="📥 Import">
+                                    📥 导入留言
+                                    <input type="file" accept=".json" onchange="commentManager.importComments(this.files[0]); this.value='';" style="display: none;">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                commentForm.appendChild(managementDiv);
+                this.updateStats();
+            }
+        }
+        
+        // 初始化评论管理器
+        let commentManager;
+        
         // 留言提交功能
         function submitComment() {
             const name = document.getElementById('commentName').value.trim();
@@ -2707,38 +3083,23 @@
                 return;
             }
             
-            // 创建新的留言
-            const commentsList = document.getElementById('comments-list');
-            const newComment = document.createElement('div');
-            newComment.className = 'comment-item';
-            
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('zh-CN') + ' | ' + now.toLocaleDateString('en-US');
-            
-            newComment.innerHTML = `
-                <div class="comment-author">${name}</div>
-                <div class="comment-date">${dateStr}</div>
-                <div class="comment-text">${text}</div>
-            `;
-            
-            // 插入到现有留言之后
-            const firstComment = commentsList.querySelector('.comment-item');
-            if (firstComment) {
-                commentsList.insertBefore(newComment, firstComment.nextSibling);
-            } else {
-                commentsList.appendChild(newComment);
+            if (!commentManager) {
+                commentManager = new CommentManager();
             }
+            
+            const success = commentManager.addComment(name, email, text);
             
             // 清空表单
             document.getElementById('commentName').value = '';
             document.getElementById('commentEmail').value = '';
             document.getElementById('commentText').value = '';
             
-            // 显示成功消息
-            showNotification(currentLanguage === 'zh' ? '留言发布成功！' : 'Comment posted successfully!', 'success');
-            
-            // 滚动到新留言
-            newComment.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // 显示相应消息
+            if (success) {
+                showNotification(currentLanguage === 'zh' ? '留言发布成功！刷新页面后仍可看到' : 'Comment posted successfully! Will persist after refresh', 'success');
+            } else {
+                showNotification(currentLanguage === 'zh' ? '留言已临时显示，但刷新后会消失（存储限制）' : 'Comment displayed temporarily, will disappear after refresh (storage limitation)', 'warning');
+            }
         }
 
         // 通知显示功能
