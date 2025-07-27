@@ -1196,7 +1196,7 @@
         <a href="#chapters" data-zh="七站征程" data-en="Seven Stops">七站征程</a>
         <a href="#gallery" data-zh="图片展示" data-en="Gallery">图片展示</a>
         <a href="#insights" data-zh="人生感悟" data-en="Life Insights">人生感悟</a>
-        <a href="#comments" data-zh="留言板" data-en="Comments">留言板</a>
+
     </nav>
 
     <div class="container">
@@ -1675,51 +1675,15 @@
             </div>
         </section>
 
-        <section id="comments">
-            <h2 data-zh="💬 留言板" data-en="💬 Comments">💬 留言板</h2>
+        <section id="contact">
+            <h2 data-zh="📧 联系方式" data-en="📧 Contact Info">📧 联系方式</h2>
             
-            <div style="background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%); color: var(--white); padding: 2rem; border-radius: 16px; margin: 2rem 0;">
-                <h3 style="color: var(--white); margin-bottom: 1rem;" data-zh="🌟 分享你的跑步故事" data-en="🌟 Share Your Running Story">🌟 分享你的跑步故事</h3>
-                <p style="color: rgba(255, 255, 255, 0.9); margin: 0;" data-zh="Henry的WMC 777之旅激励了你吗？分享你的跑步经历、挑战心得，或者对Henry说几句鼓励的话！" data-en="Was Henry's WMC 777 journey inspiring? Share your running experiences, challenge insights, or leave some encouraging words for Henry!">Henry的WMC 777之旅激励了你吗？分享你的跑步经历、挑战心得，或者对Henry说几句鼓励的话！</p>
-            </div>
-            
-            <div class="comments-section">
-                <div class="comment-form">
-                    <h4 style="color: var(--primary-blue); margin-bottom: 1rem;" data-zh="📝 留下你的感想" data-en="📝 Leave Your Thoughts">📝 留下你的感想</h4>
-                    <input type="text" id="commentName" placeholder="你的姓名 / Your Name" data-placeholder-zh="你的姓名" data-placeholder-en="Your Name">
-                    <input type="email" id="commentEmail" placeholder="邮箱（可选）/ Email (Optional)" data-placeholder-zh="邮箱（可选）" data-placeholder-en="Email (Optional)">
-                    <textarea id="commentText" rows="4" placeholder="分享你的跑步故事或对Henry的鼓励... / Share your running story or encouragement for Henry..." data-placeholder-zh="分享你的跑步故事或对Henry的鼓励..." data-placeholder-en="Share your running story or encouragement for Henry..."></textarea>
-                    <button onclick="submitComment()" data-zh="🚀 发布留言" data-en="🚀 Post Comment">🚀 发布留言</button>
-                </div>
-                
-                <div id="comments-list">
-                    <h4 style="color: var(--primary-blue); margin-bottom: 1rem;" data-zh="💌 读者留言" data-en="💌 Reader Comments">💌 读者留言</h4>
-                    
-                    <!-- 示例留言 -->
-                    <div class="comment-item">
-                        <div class="comment-author">张伟 Zhang Wei</div>
-                        <div class="comment-date">2025年1月15日 | Jan 15, 2025</div>
-                        <div class="comment-text" data-zh="Henry的故事太励志了！我也是跑步爱好者，看到他从南极的6小时到澳洲的突破，真的很感动。特别是"三人小火车"的友谊，这就是跑步的魅力啊！我今年也要挑战我的第一个全马。" data-en="Henry's story is so inspiring! I'm also a running enthusiast, and seeing his breakthrough from 6 hours in Antarctica to his achievement in Australia is really moving. Especially the friendship of the 'three-person train' - this is the charm of running! I'm going to challenge my first full marathon this year too.">Henry的故事太励志了！我也是跑步爱好者，看到他从南极的6小时到澳洲的突破，真的很感动。特别是"三人小火车"的友谊，这就是跑步的魅力啊！我今年也要挑战我的第一个全马。</div>
-                    </div>
-                    
-                    <div class="comment-item">
-                        <div class="comment-author">Lisa Chen</div>
-                        <div class="comment-date">2025年1月12日 | Jan 12, 2025</div>
-                        <div class="comment-text" data-zh="作为一个女跑者，我特别佩服Henry在这么极端的条件下坚持下来。WMC 777真的是人类极限的挑战。我最喜欢他说的"Journey is the reward"，这句话我要贴在我的跑步日记里！" data-en="As a female runner, I especially admire Henry's persistence under such extreme conditions. WMC 777 is truly a challenge to human limits. I love his saying 'Journey is the reward' - I'm going to stick this in my running diary!">作为一个女跑者，我特别佩服Henry在这么极端的条件下坚持下来。WMC 777真的是人类极限的挑战。我最喜欢他说的"Journey is the reward"，这句话我要贴在我的跑步日记里！</div>
-                    </div>
-                    
-                    <div class="comment-item">
-                        <div class="comment-author">Michael Rodriguez</div>
-                        <div class="comment-date">2025年1月10日 | Jan 10, 2025</div>
-                        <div class="comment-text" data-zh="Incredible journey! I've been following WMC 777 for years but never had the courage to sign up. Henry's detailed sharing gives me a real insight into what it takes. The friendship with Zhao Xi'an and Yuki sounds amazing. Maybe 2026 will be my year to try!" data-en="Incredible journey! I've been following WMC 777 for years but never had the courage to sign up. Henry's detailed sharing gives me a real insight into what it takes. The friendship with Zhao Xi'an and Yuki sounds amazing. Maybe 2026 will be my year to try!">Incredible journey! I've been following WMC 777 for years but never had the courage to sign up. Henry's detailed sharing gives me a real insight into what it takes. The friendship with Zhao Xi'an and Yuki sounds amazing. Maybe 2026 will be my year to try!</div>
-                    </div>
-                    
-                    <div class="comment-item">
-                        <div class="comment-author">王小明</div>
-                        <div class="comment-date">2025年1月8日 | Jan 8, 2025</div>
-                        <div class="comment-text">Charles的按摩技术也太神奇了吧！从"扶楼梯"到"腿部正常"，这简直是奇迹！我也想找Charles按摩一次🤣 不过说真的，这种友谊和互相帮助真的很感人。</div>
-                    </div>
-                </div>
+            <div style="background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%); color: var(--white); padding: 2rem; border-radius: 16px; margin: 2rem 0; text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📬</div>
+                <h3 style="color: var(--white); margin-bottom: 1rem;" data-zh="如需联系，请发送邮件至：" data-en="For contact, please email:">如需联系，请发送邮件至：</h3>
+                <a href="mailto:fanrui@gmail.com" style="color: var(--white); font-size: 1.5rem; font-weight: 600; text-decoration: none; background: rgba(255, 255, 255, 0.1); padding: 0.75rem 2rem; border-radius: 50px; display: inline-block; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
+                    fanrui@gmail.com
+                </a>
             </div>
         </section>
     </div>
@@ -2696,19 +2660,19 @@
             }
         }
 
-        // 简化但可靠的留言管理系统
+        // 实用的留言管理系统（内存存储）
         class CommentManager {
             constructor() {
                 this.comments = [];
                 this.maxComments = 50;
-                this.storageKey = 'wmc777_comments';
-                console.log('CommentManager initialized');
+                console.log('CommentManager initialized - Session storage only');
                 this.init();
             }
             
             init() {
                 try {
-                    this.loadComments();
+                    // 只从内存初始化示例留言
+                    this.loadSampleComments();
                     this.renderComments();
                     this.addInfoUI();
                     console.log('CommentManager init completed');
@@ -2722,46 +2686,32 @@
                 return 'comment_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             }
             
-            // 保存留言到URL片段
-            saveComments() {
-                try {
-                    // 方法1: 尝试使用URL片段保存数据
-                    const data = btoa(encodeURIComponent(JSON.stringify(this.comments.slice(0, 10)))); // 只保存最新10条
-                    const newUrl = window.location.pathname + window.location.search + '#data=' + data;
-                    
-                    // 不使用pushState，避免影响浏览历史
-                    window.location.hash = 'data=' + data;
-                    console.log('Comments saved to URL fragment');
-                    return { saved: true, method: 'URL Fragment' };
-                } catch (error) {
-                    console.log('URL fragment save failed:', error);
-                    return { saved: false, method: 'None' };
-                }
-            }
-            
-            // 从URL片段加载留言
-            loadComments() {
-                try {
-                    // 从URL片段读取数据
-                    const hash = window.location.hash;
-                    if (hash && hash.startsWith('#data=')) {
-                        const data = hash.substring(6); // 移除 '#data='
-                        const decoded = JSON.parse(decodeURIComponent(atob(data)));
-                        
-                        if (Array.isArray(decoded) && decoded.length > 0) {
-                            this.comments = decoded;
-                            console.log('Comments loaded from URL fragment:', this.comments.length);
-                            return { loaded: true, method: 'URL Fragment' };
-                        }
+            // 加载示例留言（模拟已有的留言）
+            loadSampleComments() {
+                this.comments = [
+                    {
+                        id: 'sample_1',
+                        name: '跑步爱好者李明',
+                        email: '',
+                        text: '刚看完Henry的WMC 777故事，太震撼了！特别是澳洲那站的血脉觉醒，真的很励志。我也要开始准备我的第一个全马了！',
+                        date: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() // 2小时前
+                    },
+                    {
+                        id: 'sample_2',
+                        name: 'Running Emma',
+                        email: '',
+                        text: 'What an incredible journey! The friendship with Zhao Xi\'an and Yuki shows the true spirit of running. The "three-person train" story made me cry. 🏃‍♀️❤️',
+                        date: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString() // 6小时前
+                    },
+                    {
+                        id: 'sample_3',
+                        name: '马拉松新手小王',
+                        email: '',
+                        text: 'Charles的按摩技术也太神了吧！从"扶楼梯"到"腿部正常"，这种恢复能力让我对马拉松的恢复有了新认识。请问Henry有Charles的联系方式吗？😄',
+                        date: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString() // 12小时前
                     }
-                } catch (error) {
-                    console.log('Failed to load from URL fragment:', error);
-                }
-                
-                // 如果没有数据，使用空数组
-                this.comments = [];
-                console.log('Using empty comments array');
-                return { loaded: false, method: 'Memory' };
+                ];
+                console.log('Sample comments loaded:', this.comments.length);
             }
             
             // 添加留言
@@ -2795,9 +2745,6 @@
                     
                     console.log('Comment added:', comment);
                     
-                    // 保存到URL
-                    const saveResult = this.saveComments();
-                    
                     // 重新渲染
                     this.renderComments();
                     this.updateStats();
@@ -2817,9 +2764,6 @@
                     
                     if (this.comments.length < initialLength) {
                         console.log('Comment deleted:', commentId);
-                        
-                        // 保存变更
-                        this.saveComments();
                         
                         // 重新渲染
                         this.renderComments();
@@ -2882,16 +2826,22 @@
                         
                         const deleteText = currentLanguage === 'zh' ? '删除' : 'Delete';
                         
+                        // 判断是否是示例留言（不可删除）
+                        const isSample = comment.id.startsWith('sample_');
+                        const deleteButton = isSample ? '' : `
+                            <button onclick="deleteComment('${comment.id}')" 
+                                    style="background: none; border: none; color: #ef4444; font-size: 0.8rem; cursor: pointer; padding: 0.2rem 0.5rem; border-radius: 4px; opacity: 0.7; transition: all 0.2s ease;"
+                                    onmouseover="this.style.opacity='1'; this.style.background='rgba(239, 68, 70, 0.1)'"
+                                    onmouseout="this.style.opacity='0.7'; this.style.background='none'"
+                                    title="${deleteText}">
+                                🗑️
+                            </button>
+                        `;
+                        
                         commentElement.innerHTML = `
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
                                 <div class="comment-author">${comment.name} ${recentBadge}</div>
-                                <button onclick="deleteComment('${comment.id}')" 
-                                        style="background: none; border: none; color: #ef4444; font-size: 0.8rem; cursor: pointer; padding: 0.2rem 0.5rem; border-radius: 4px; opacity: 0.7; transition: all 0.2s ease;"
-                                        onmouseover="this.style.opacity='1'; this.style.background='rgba(239, 68, 70, 0.1)'"
-                                        onmouseout="this.style.opacity='0.7'; this.style.background='none'"
-                                        title="${deleteText}">
-                                    🗑️
-                                </button>
+                                ${deleteButton}
                             </div>
                             <div class="comment-date">${dateStr}</div>
                             <div class="comment-text">${comment.text}</div>
@@ -2907,8 +2857,8 @@
                     
                     console.log('Rendered', this.comments.length, 'comments');
                     
-                    // 滚动到最新留言
-                    if (this.comments.length > 0) {
+                    // 滚动到最新留言（如果是新添加的）
+                    if (this.comments.length > 0 && !this.comments[0].id.startsWith('sample_')) {
                         const firstDynamicComment = commentsList.querySelector('.dynamic-comment');
                         if (firstDynamicComment) {
                             setTimeout(() => {
@@ -2937,7 +2887,7 @@
                     const statsElement = document.getElementById('comment-stats');
                     if (statsElement) {
                         const countText = currentLanguage === 'zh' ? '条留言' : 'comments';
-                        const storageInfo = currentLanguage === 'zh' ? '已保存到URL' : 'Saved in URL';
+                        const storageInfo = currentLanguage === 'zh' ? '当前会话' : 'Current Session';
                         
                         statsElement.innerHTML = `
                             <span style="color: #6b7280; font-size: 0.8rem;">
@@ -2961,13 +2911,13 @@
                     
                     const infoDiv = document.createElement('div');
                     infoDiv.innerHTML = `
-                        <div style="margin-top: 1rem; padding: 1rem; background: rgba(255, 193, 7, 0.1); border-radius: 8px; border: 1px solid rgba(255, 193, 7, 0.3);">
+                        <div style="margin-top: 1rem; padding: 1rem; background: rgba(239, 68, 68, 0.1); border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.3);">
                             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
                                 <div id="comment-stats">
                                     <span style="color: #6b7280; font-size: 0.8rem;">💭 Loading...</span>
                                 </div>
-                                <div style="font-size: 0.75rem; color: #856404; text-align: right;">
-                                    <span data-zh="⚠️ 留言保存在URL中，分享链接可保留留言" data-en="⚠️ Comments saved in URL, sharing link preserves comments">⚠️ 留言保存在URL中，分享链接可保留留言</span>
+                                <div style="font-size: 0.75rem; color: #dc2626; text-align: right;">
+                                    <span data-zh="⚠️ 由于iframe限制，留言仅在当前会话有效，刷新页面会重置" data-en="⚠️ Due to iframe limitations, comments are only valid for current session, refreshing will reset">⚠️ 由于iframe限制，留言仅在当前会话有效，刷新页面会重置</span>
                                 </div>
                             </div>
                         </div>
@@ -2981,124 +2931,27 @@
             }
         }
         
-        // 删除留言功能
-        function deleteComment(commentId) {
-            showConfirmDialog(
-                currentLanguage === 'zh' ? '确认删除这条留言吗？' : 'Are you sure you want to delete this comment?',
-                () => {
-                    if (commentManager) {
-                        const success = commentManager.deleteComment(commentId);
-                        if (success) {
-                            showNotification(currentLanguage === 'zh' ? '留言已删除' : 'Comment deleted', 'success');
-                        } else {
-                            showNotification(currentLanguage === 'zh' ? '删除失败' : 'Delete failed', 'error');
-                        }
-                    }
+        // 发送聊天消息到Poe
+        async function sendChatMessage() {
+            try {
+                if (!window.Poe || !window.Poe.sendUserMessage) {
+                    showNotification(currentLanguage === 'zh' ? 'Poe聊天功能不可用' : 'Poe chat feature unavailable', 'error');
+                    return;
                 }
-            );
-        }
-
-        // 自定义确认对话框
-        function showConfirmDialog(message, onConfirm) {
-            const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-            modal.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.5);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 3000;
-                backdrop-filter: blur(5px);
-            `;
-            
-            modal.innerHTML = `
-                <div style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); max-width: 400px; width: 90%; margin: 0 1rem;">
-                    <p style="color: #374151; margin-bottom: 1.5rem; font-size: 1rem; line-height: 1.5;">${message}</p>
-                    <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
-                        <button class="cancel-btn" style="padding: 0.5rem 1rem; color: #6b7280; background: #f3f4f6; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; transition: background 0.2s;">${currentLanguage === 'zh' ? '取消' : 'Cancel'}</button>
-                        <button class="confirm-btn" style="padding: 0.5rem 1rem; color: white; background: #ef4444; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; transition: background 0.2s;">${currentLanguage === 'zh' ? '确认删除' : 'Confirm Delete'}</button>
-                    </div>
-                </div>
-            `;
-            
-            // 暗色模式适配
-            if (document.body.classList.contains('dark')) {
-                const dialog = modal.querySelector('div');
-                dialog.style.background = '#1f2937';
-                dialog.style.color = '#f3f4f6';
-                const message = dialog.querySelector('p');
-                message.style.color = '#d1d5db';
-            }
-            
-            document.body.appendChild(modal);
-            
-            // 添加事件监听
-            modal.querySelector('.cancel-btn').onclick = () => {
-                document.body.removeChild(modal);
-            };
-            
-            modal.querySelector('.confirm-btn').onclick = () => {
-                document.body.removeChild(modal);
-                onConfirm();
-            };
-            
-            // 点击背景关闭
-            modal.onclick = (e) => {
-                if (e.target === modal) {
-                    document.body.removeChild(modal);
-                }
-            };
-            
-            // ESC键关闭
-            const handleEsc = (e) => {
-                if (e.key === 'Escape') {
-                    document.body.removeChild(modal);
-                    document.removeEventListener('keydown', handleEsc);
-                }
-            };
-            document.addEventListener('keydown', handleEsc);
-        }
-
-        // 初始化评论管理器
-        let commentManager;
-        
-        // 留言提交功能
-        function submitComment() {
-            const name = document.getElementById('commentName').value.trim();
-            const email = document.getElementById('commentEmail').value.trim();
-            const text = document.getElementById('commentText').value.trim();
-            
-            if (!name || !text) {
-                showNotification(currentLanguage === 'zh' ? '请填写姓名和留言内容' : 'Please fill in name and comment content', 'error');
-                return;
-            }
-            
-            if (text.length > 500) {
-                showNotification(currentLanguage === 'zh' ? '留言内容不能超过500字符' : 'Comment cannot exceed 500 characters', 'error');
-                return;
-            }
-            
-            // 初始化管理器（如果还没有）
-            if (!commentManager) {
-                commentManager = new CommentManager();
-            }
-            
-            const success = commentManager.addComment(name, email, text);
-            
-            if (success) {
-                // 清空表单
-                document.getElementById('commentName').value = '';
-                document.getElementById('commentEmail').value = '';
-                document.getElementById('commentText').value = '';
                 
-                showNotification(currentLanguage === 'zh' ? '留言发布成功！' : 'Comment posted successfully!', 'success');
-            } else {
-                showNotification(currentLanguage === 'zh' ? '留言发布失败，请重试' : 'Failed to post comment, please try again', 'error');
+                const messageText = currentLanguage === 'zh' ? 
+                    '@Claude-Sonnet-4 你好！我刚看完Henry的WMC 777马拉松故事，觉得很受启发。我想和Henry分享一下我的跑步经历和感想。' :
+                    '@Claude-Sonnet-4 Hello! I just finished reading Henry\'s WMC 777 marathon story and found it very inspiring. I would like to share my running experiences and thoughts with Henry.';
+                
+                await window.Poe.sendUserMessage(messageText, {
+                    openChat: true
+                });
+                
+                showNotification(currentLanguage === 'zh' ? '已在聊天中发送消息！' : 'Message sent in chat!', 'success');
+                
+            } catch (error) {
+                console.error('Failed to send chat message:', error);
+                showNotification(currentLanguage === 'zh' ? '发送失败，请重试' : 'Send failed, please try again', 'error');
             }
         }
 
