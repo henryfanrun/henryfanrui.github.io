@@ -4,15 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Henry 的 WMC 777 - 六天七大洲七场马拉松的极限挑战</title>
-    <meta name="description" content="Henry参加World Marathon Challenge 777的完整记录，包含赛事介绍、报名信息、个人经历分享和精彩图片展示。">
+    <meta name="description" content="Henry参加World Marathon Challenge 777的完整记录，包含赛事介绍、个人经历分享、征程伙伴故事和精彩图片展示。">
     <meta name="keywords" content="马拉松,WMC777,World Marathon Challenge,跑步,极限挑战,七大洲,Henry">
     
     <!-- Leaflet 地图库 -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
+    <!-- Chart.js 图表库 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
-        /* GlobeVisa商务风格设计系统 */
         * {
             margin: 0;
             padding: 0;
@@ -47,10 +49,59 @@
             transition: all 0.3s ease;
         }
         
-        /* 深色模式 */
         body.dark {
             background: linear-gradient(135deg, var(--gray-900) 0%, var(--primary-blue) 100%);
             color: var(--gray-100);
+        }
+        
+        /* 语言切换器 */
+        .language-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 0.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        body.dark .language-switcher {
+            background: rgba(31, 41, 55, 0.95);
+        }
+        
+        .language-switcher button {
+            background: none;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            margin: 0 0.2rem;
+        }
+        
+        .language-switcher button.active {
+            background: var(--primary-blue);
+            color: white;
+        }
+        
+        .language-switcher button:not(.active) {
+            color: var(--gray-600);
+        }
+        
+        .language-switcher button:not(.active):hover {
+            background: var(--gray-100);
+        }
+        
+        body.dark .language-switcher button:not(.active) {
+            color: var(--gray-300);
+        }
+        
+        body.dark .language-switcher button:not(.active):hover {
+            background: var(--gray-600);
         }
         
         header {
@@ -82,8 +133,6 @@
         header h1 {
             font-size: 3.5rem;
             font-weight: 800;
-            color: var(--white);
-            letter-spacing: -0.02em;
             margin-bottom: 1rem;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
@@ -181,7 +230,6 @@
             padding: 3rem 1rem;
         }
         
-        /* GlobeVisa卡片风格 */
         section {
             margin-bottom: 3rem;
             padding: 3rem;
@@ -209,7 +257,6 @@
             border: 1px solid rgba(96, 165, 250, 0.2);
         }
         
-        /* 专业标题设计 */
         h2 {
             font-size: 2.8rem;
             font-weight: 800;
@@ -257,13 +304,11 @@
             color: var(--accent-blue);
         }
         
-        /* 专业段落样式 */
         p {
             font-size: 1.1rem;
             line-height: 1.8;
             color: var(--gray-600);
             margin-bottom: 1.5rem;
-            text-align: justify;
         }
         
         body.dark p {
@@ -293,102 +338,95 @@
             border-color: rgba(96, 165, 250, 0.3);
         }
         
-        /* 表单样式 */
-        form {
-            background: var(--gray-50);
-            padding: 3rem;
-            border-radius: 20px;
-            border: 1px solid rgba(59, 130, 246, 0.1);
+        /* 图表样式 */
+        .chart-container {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
             margin: 2rem 0;
+            border: 1px solid rgba(59, 130, 246, 0.1);
         }
         
-        body.dark form {
-            background: var(--gray-700);
+        body.dark .chart-container {
+            background: var(--gray-800);
             border: 1px solid rgba(96, 165, 250, 0.2);
         }
         
-        label {
-            display: block;
-            font-weight: 600;
-            color: var(--gray-700);
-            margin-bottom: 0.5rem;
+        #performanceChart {
+            max-height: 400px;
         }
         
-        body.dark label {
-            color: var(--gray-200);
-        }
-        
-        input, select, textarea {
-            width: 100%;
-            padding: 1rem;
-            border: 2px solid var(--gray-200);
-            border-radius: 12px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-            background: var(--white);
-            margin-bottom: 1.5rem;
-        }
-        
-        body.dark input,
-        body.dark select,
-        body.dark textarea {
-            background: var(--gray-600);
-            border-color: var(--gray-500);
-            color: var(--white);
-        }
-        
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--secondary-blue);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-        
-        button {
-            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
-            color: var(--white);
-            padding: 1.2rem 3rem;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 20px rgba(30, 58, 138, 0.3);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(30, 58, 138, 0.4);
-        }
-        
-        button:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .gallery {
+        /* 人物卡片样式 */
+        .teammate-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
-            margin-top: 2rem;
+            margin: 2rem 0;
         }
         
-        .gallery img {
-            width: 100%;
-            border-radius: 12px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        .teammate-card {
+            background: linear-gradient(145deg, var(--white) 0%, var(--gray-50) 100%);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            box-shadow: 0 6px 24px rgba(30, 58, 138, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
         
-        .gallery img:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        .teammate-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--secondary-blue);
         }
         
-        /* GlobeVisa章节导航卡片 */
+        body.dark .teammate-card {
+            background: linear-gradient(145deg, var(--gray-800) 0%, var(--gray-700) 100%);
+            border: 1px solid rgba(96, 165, 250, 0.2);
+        }
+        
+        .teammate-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 40px rgba(30, 58, 138, 0.2);
+        }
+        
+        .teammate-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--secondary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 1rem;
+        }
+        
+        .teammate-card h4 {
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+        
+        body.dark .teammate-card h4 {
+            color: var(--accent-blue);
+        }
+        
+        .teammate-role {
+            font-size: 0.9rem;
+            color: var(--gold);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        /* 章节导航卡片 */
         .chapter-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -405,6 +443,7 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
         
         .chapter-card::before {
@@ -442,7 +481,6 @@
             color: var(--accent-blue);
         }
         
-        /* 专业统计标签 */
         .chapter-stats {
             display: flex;
             flex-wrap: wrap;
@@ -477,54 +515,195 @@
             border: 1px solid rgba(96, 165, 250, 0.3);
         }
         
-        .chapter-card p {
+        /* 模态窗口样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background-color: var(--white);
+            margin: 2% auto;
+            padding: 3rem;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        
+        body.dark .modal-content {
+            background-color: var(--gray-800);
+        }
+        
+        .close {
+            color: var(--gray-600);
+            float: right;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            z-index: 2001;
+        }
+        
+        .close:hover {
+            color: var(--primary-blue);
+        }
+        
+        /* 留言板样式 */
+        .comments-section {
+            background: var(--gray-50);
+            padding: 2rem;
+            border-radius: 16px;
+            margin: 2rem 0;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+        
+        body.dark .comments-section {
+            background: var(--gray-700);
+            border: 1px solid rgba(96, 165, 250, 0.2);
+        }
+        
+        .comment-form {
+            margin-bottom: 2rem;
+        }
+        
+        .comment-form input,
+        .comment-form textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
             font-size: 1rem;
+            margin-bottom: 1rem;
+            background: var(--white);
+            transition: border-color 0.3s ease;
+        }
+        
+        body.dark .comment-form input,
+        body.dark .comment-form textarea {
+            background: var(--gray-600);
+            border-color: var(--gray-500);
+            color: var(--white);
+        }
+        
+        .comment-form input:focus,
+        .comment-form textarea:focus {
+            outline: none;
+            border-color: var(--secondary-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .comment-item {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--secondary-blue);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        body.dark .comment-item {
+            background: var(--gray-600);
+        }
+        
+        .comment-author {
+            font-weight: 600;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+        
+        body.dark .comment-author {
+            color: var(--accent-blue);
+        }
+        
+        .comment-date {
+            font-size: 0.8rem;
             color: var(--gray-600);
             margin-bottom: 1rem;
-            line-height: 1.7;
-            text-align: justify;
         }
         
-        body.dark .chapter-card p {
-            color: var(--gray-200);
+        body.dark .comment-date {
+            color: var(--gray-300);
         }
         
-        .chapter-card p:last-child {
-            margin-bottom: 0;
-        }
-        
-        /* GlobeVisa专业底部 */
-        footer {
-            text-align: center;
-            padding: 4rem 1rem;
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
-            color: var(--white);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        footer::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="footerGrid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23footerGrid)"/></svg>');
-            opacity: 0.3;
-        }
-        
-        footer p {
-            position: relative;
-            z-index: 2;
-            font-size: 1rem;
-            font-weight: 500;
-            color: var(--light-blue);
+        .comment-text {
+            color: var(--gray-700);
+            line-height: 1.6;
             margin: 0;
         }
         
-        body.dark footer {
-            background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-800) 100%);
+        body.dark .comment-text {
+            color: var(--gray-200);
+        }
+        
+        button {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: var(--white);
+            padding: 1.2rem 3rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(30, 58, 138, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(30, 58, 138, 0.4);
+        }
+        
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* 引用样式 */
+        blockquote {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(96, 165, 250, 0.05));
+            border-left: 4px solid var(--secondary-blue);
+            padding: 2rem;
+            margin: 2rem 0;
+            border-radius: 12px;
+            font-style: italic;
+            font-size: 1.2rem;
+            color: var(--gray-700);
+        }
+        
+        body.dark blockquote {
+            background: linear-gradient(135deg, rgba(96, 165, 250, 0.15), rgba(59, 130, 246, 0.08));
+            color: var(--gray-200);
+        }
+        
+        /* 列表样式 */
+        ul {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+        
+        ul li {
+            margin-bottom: 0.5rem;
+            color: var(--gray-600);
+        }
+        
+        body.dark ul li {
+            color: var(--gray-200);
         }
         
         /* 图片轮播样式 */
@@ -592,7 +771,6 @@
             margin: 0;
         }
         
-        /* 导航按钮 */
         .carousel-nav {
             position: absolute;
             top: 50%;
@@ -609,7 +787,6 @@
             transition: all 0.3s ease;
             z-index: 10;
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
         }
         
         .carousel-nav:hover {
@@ -626,16 +803,6 @@
             right: 1rem;
         }
         
-        body.dark .carousel-nav {
-            background: rgba(28, 28, 30, 0.9);
-            color: white;
-        }
-        
-        body.dark .carousel-nav:hover {
-            background: var(--gray-700);
-        }
-        
-        /* 指示器 */
         .carousel-indicators {
             position: absolute;
             bottom: 1rem;
@@ -665,8 +832,49 @@
             background: rgba(255, 255, 255, 0.8);
         }
         
+        /* 底部 */
+        footer {
+            text-align: center;
+            padding: 4rem 1rem;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="footerGrid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23footerGrid)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        footer p {
+            position: relative;
+            z-index: 2;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--light-blue);
+            margin: 0;
+        }
+        
         /* 响应式设计 */
         @media (max-width: 768px) {
+            .language-switcher {
+                top: 10px;
+                right: 10px;
+                padding: 0.3rem;
+            }
+            
+            .language-switcher button {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+            
             header h1 {
                 font-size: 2.5rem;
             }
@@ -693,10 +901,6 @@
                 margin-bottom: 2rem;
             }
             
-            form {
-                padding: 2rem;
-            }
-            
             h2 {
                 font-size: 2rem;
             }
@@ -705,50 +909,21 @@
                 height: 400px;
             }
             
-            .gallery {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
-            
-            .chapter-grid {
+            .chapter-grid,
+            .teammate-grid {
                 grid-template-columns: 1fr;
                 gap: 1rem;
+            }
+            
+            .modal-content {
+                width: 95%;
+                padding: 2rem;
+                margin: 5% auto;
             }
             
             .carousel {
                 height: 400px;
             }
-            
-            .carousel-nav {
-                width: 40px;
-                height: 40px;
-                font-size: 1.2rem;
-            }
-            
-            .carousel-prev {
-                left: 0.5rem;
-            }
-            
-            .carousel-next {
-                right: 0.5rem;
-            }
-            
-            .carousel-caption {
-                padding: 2rem 1rem 1rem;
-            }
-            
-            .carousel-caption h3 {
-                font-size: 1.2rem;
-            }
-            
-            .carousel-caption p {
-                font-size: 0.9rem;
-            }
-        }
-        
-        /* 平滑滚动 */
-        html {
-            scroll-behavior: smooth;
         }
         
         /* 动画效果 */
@@ -765,28 +940,6 @@
         
         section {
             animation: fadeInUp 0.6s ease-out;
-        }
-        
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translate(-50%, -60%);
-            }
-            to {
-                opacity: 1;
-                transform: translate(-50%, -50%);
-            }
-        }
-        
-        @keyframes slideOut {
-            from {
-                opacity: 1;
-                transform: translate(-50%, -50%);
-            }
-            to {
-                opacity: 0;
-                transform: translate(-50%, -40%);
-            }
         }
         
         /* 加载动画 */
@@ -811,321 +964,384 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
+        
+        /* 隐藏类 */
+        .hidden {
+            display: none !important;
+        }
+        
+        /* 平滑滚动 */
+        html {
+            scroll-behavior: smooth;
+        }
     </style>
 </head>
 <body>
+    <!-- 语言切换器 -->
+    <div class="language-switcher">
+        <button onclick="switchLanguage('zh')" class="active" id="lang-zh">中文</button>
+        <button onclick="switchLanguage('en')" id="lang-en">English</button>
+    </div>
+
     <header>
         <div class="header-content">
-            <h1>Henry 的 WMC 777</h1>
-            <p class="subtitle">六天，七大洲，七场马拉松的极限挑战</p>
+            <h1 data-zh="Henry 的 WMC 777" data-en="Henry's WMC 777">Henry 的 WMC 777</h1>
+            <p class="subtitle" data-zh="六天，七大洲，七场马拉松的极限挑战" data-en="Six Days, Seven Continents, Seven Marathons - The Ultimate Challenge">六天，七大洲，七场马拉松的极限挑战</p>
             <div class="globe-badge">
-                全球马拉松征程
+                <span data-zh="全球马拉松征程" data-en="Global Marathon Journey">全球马拉松征程</span>
             </div>
         </div>
     </header>
 
     <nav>
-        <a href="#race-introduction">赛事介绍</a>
-        <a href="#race-route">征程路线</a>
-        <a href="#registration">赛事报名</a>
-        <a href="#introduction">写在开始之前</a>
-        <a href="#chapters">章节导航</a>
-        <a href="#gallery">图片展示</a>
-        <a href="#conclusion">结束语</a>
+        <a href="#race-introduction" data-zh="赛事介绍" data-en="Race Info">赛事介绍</a>
+        <a href="#race-route" data-zh="征程路线" data-en="Route Map">征程路线</a>
+        <a href="#performance" data-zh="成绩分析" data-en="Performance">成绩分析</a>
+        <a href="#teammates" data-zh="征程伙伴" data-en="Teammates">征程伙伴</a>
+        <a href="#introduction" data-zh="写在开始之前" data-en="Before Start">写在开始之前</a>
+        <a href="#chapters" data-zh="七站征程" data-en="Seven Stops">七站征程</a>
+        <a href="#gallery" data-zh="图片展示" data-en="Gallery">图片展示</a>
+        <a href="#insights" data-zh="人生感悟" data-en="Life Insights">人生感悟</a>
+        <a href="#comments" data-zh="留言板" data-en="Comments">留言板</a>
     </nav>
 
     <div class="container">
         <section id="race-introduction">
-            <h2>🌍 World Marathon Challenge 777 赛事介绍</h2>
+            <h2 data-zh="🌍 World Marathon Challenge 777 赛事介绍" data-en="🌍 World Marathon Challenge 777 Race Introduction">🌍 World Marathon Challenge 777 赛事介绍</h2>
             
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin: 2rem 0;">
                 <div style="background: linear-gradient(135deg, var(--light-blue) 0%, rgba(59, 130, 246, 0.1) 100%); padding: 2rem; border-radius: 16px; border: 1px solid rgba(59, 130, 246, 0.2);">
-                    <h3 style="color: var(--primary-blue); margin-bottom: 1rem;">🏃‍♂️ 终极挑战</h3>
-                    <p>World Marathon Challenge 777 被誉为<strong>世界上最具挑战性的马拉松赛事</strong>，参赛者需要在连续7天内，跨越7个大洲，完成7场标准马拉松（42.195公里）。</p>
+                    <h3 style="color: var(--primary-blue); margin-bottom: 1rem;" data-zh="🏃‍♂️ 终极挑战" data-en="🏃‍♂️ Ultimate Challenge">🏃‍♂️ 终极挑战</h3>
+                    <p data-zh="World Marathon Challenge 777 被誉为世界上最具挑战性的马拉松赛事，参赛者需要在连续7天内，跨越7个大洲，完成7场标准马拉松（42.195公里）。" data-en="World Marathon Challenge 777 is hailed as the world's most challenging marathon event. Participants must complete 7 standard marathons (42.195km) across 7 continents in 7 consecutive days.">World Marathon Challenge 777 被誉为<strong>世界上最具挑战性的马拉松赛事</strong>，参赛者需要在连续7天内，跨越7个大洲，完成7场标准马拉松（42.195公里）。</p>
                 </div>
                 
                 <div style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 191, 36, 0.05) 100%); padding: 2rem; border-radius: 16px; border: 1px solid rgba(245, 158, 11, 0.2);">
-                    <h3 style="color: var(--gold); margin-bottom: 1rem;">⏰ 时间限制</h3>
-                    <p>每场马拉松必须在<strong>6小时20分钟</strong>内完成。这不仅考验体能，更是对意志力、时差适应能力和心理韧性的极限测试。</p>
+                    <h3 style="color: var(--gold); margin-bottom: 1rem;" data-zh="⏰ 时间限制" data-en="⏰ Time Limit">⏰ 时间限制</h3>
+                    <p data-zh="每场马拉松必须在6小时20分钟内完成。这不仅考验体能，更是对意志力、时差适应能力和心理韧性的极限测试。" data-en="Each marathon must be completed within 6 hours and 20 minutes. This tests not only physical endurance but also willpower, jet lag adaptation, and psychological resilience.">每场马拉松必须在<strong>6小时20分钟</strong>内完成。这不仅考验体能，更是对意志力、时差适应能力和心理韧性的极限测试。</p>
                 </div>
             </div>
 
             <div style="background: rgba(16, 185, 129, 0.1); padding: 2rem; border-radius: 16px; border: 1px solid rgba(16, 185, 129, 0.2); margin: 2rem 0;">
-                <h4 style="color: var(--success); margin-bottom: 1rem;">🏆 完赛意义</h4>
-                <p>World Marathon Challenge 777 被认为是<strong>世界上最困难的跑步挑战之一</strong>。每年全球只有不到100人敢于尝试，完赛率约为85%。完成这项挑战不仅是对个人极限的突破，更是加入了一个极其精英的全球跑者社群。</p>
+                <h4 style="color: var(--success); margin-bottom: 1rem;" data-zh="🏆 完赛意义" data-en="🏆 Completion Significance">🏆 完赛意义</h4>
+                <p data-zh="World Marathon Challenge 777 被认为是世界上最困难的跑步挑战之一。每年全球只有不到100人敢于尝试，完赛率约为85%。完成这项挑战不仅是对个人极限的突破，更是加入了一个极其精英的全球跑者社群。" data-en="World Marathon Challenge 777 is considered one of the world's most difficult running challenges. Less than 100 people worldwide attempt it annually, with a completion rate of about 85%. Finishing this challenge is not only a breakthrough of personal limits but also joining an extremely elite global running community.">World Marathon Challenge 777 被认为是<strong>世界上最困难的跑步挑战之一</strong>。每年全球只有不到100人敢于尝试，完赛率约为85%。完成这项挑战不仅是对个人极限的突破，更是加入了一个极其精英的全球跑者社群。</p>
             </div>
         </section>
 
         <section id="race-route">
-            <h2>🗺️ 全球征程路线图</h2>
+            <h2 data-zh="🗺️ 全球征程路线图" data-en="🗺️ Global Journey Route Map">🗺️ 全球征程路线图</h2>
             
             <div style="background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%); color: var(--white); padding: 2rem; border-radius: 16px; margin: 2rem 0;">
-                <h3 style="color: var(--white); margin-bottom: 1rem;">🌍 七天横跨七大洲的马拉松之旅</h3>
-                <p style="color: rgba(255, 255, 255, 0.9); margin: 0;">从南极的冰雪世界到迈阿密的海滨夜跑，跟随Henry的足迹，感受这场史诗级的全球马拉松挑战！点击地图上的标记查看每站详情。</p>
+                <h3 style="color: var(--white); margin-bottom: 1rem;" data-zh="🌍 七天横跨七大洲的马拉松之旅" data-en="🌍 Seven-Day Marathon Journey Across Seven Continents">🌍 七天横跨七大洲的马拉松之旅</h3>
+                <p style="color: rgba(255, 255, 255, 0.9); margin: 0;" data-zh="从南极的冰雪世界到迈阿密的海滨夜跑，跟随Henry的足迹，感受这场史诗级的全球马拉松挑战！点击地图上的标记查看每站详情。" data-en="From Antarctica's icy world to Miami's beachside night run, follow Henry's footsteps and experience this epic global marathon challenge! Click on map markers to view details of each stop.">从南极的冰雪世界到迈阿密的海滨夜跑，跟随Henry的足迹，感受这场史诗级的全球马拉松挑战！点击地图上的标记查看每站详情。</p>
             </div>
             
             <!-- 地图容器 -->
             <div id="race-map" class="loading">
-                正在加载全球征程地图...
+                <span data-zh="正在加载全球征程地图..." data-en="Loading global journey map...">正在加载全球征程地图...</span>
             </div>
             
             <!-- 路线说明 -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
                 <div style="background: var(--white); padding: 1.5rem; border-radius: 12px; border-left: 4px solid #00d4ff; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
-                    <h4 style="color: #00d4ff; margin-bottom: 0.5rem;">🏔️ 第1站：南极洲</h4>
-                    <p style="margin: 0; font-size: 0.95rem; color: var(--gray-600);">联合冰川营地<br>-20°C到-30°C 的极地挑战<br><strong>排名：41 | 时间：~6小时</strong></p>
+                    <h4 style="color: #00d4ff; margin-bottom: 0.5rem;" data-zh="🏔️ 第1站：南极洲" data-en="🏔️ Stop 1: Antarctica">🏔️ 第1站：南极洲</h4>
+                    <p style="margin: 0; font-size: 0.95rem; color: var(--gray-600);" data-zh="联合冰川营地<br>-20°C到-30°C 的极地挑战<br><strong>排名：41 | 时间：~6小时</strong>" data-en="Union Glacier Camp<br>-20°C to -30°C polar challenge<br><strong>Rank: 41 | Time: ~6 hours</strong>">联合冰川营地<br>-20°C到-30°C 的极地挑战<br><strong>排名：41 | 时间：~6小时</strong></p>
                 </div>
                 
                 <div style="background: var(--white); padding: 1.5rem; border-radius: 12px; border-left: 4px solid #ff6b35; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
-                    <h4 style="color: #ff6b35; margin-bottom: 0.5rem;">🌍 第2站：非洲</h4>
-                    <p style="margin: 0; font-size: 0.95rem; color: var(--gray-600);">南非开普敦<br>桌山脚下的酷热赛道<br><strong>排名：25 | 时间：5:17</strong></p>
+                    <h4 style="color: #ff6b35; margin-bottom: 0.5rem;" data-zh="🌍 第2站：非洲" data-en="🌍 Stop 2: Africa">🌍 第2站：非洲</h4>
+                    <p style="margin: 0; font-size: 0.95rem; color: var(--gray-600);" data-zh="南非开普敦<br>桌山脚下的酷热赛道<br><strong>排名：25 | 时间：5:17</strong>" data-en="Cape Town, South Africa<br>Hot course at foot of Table Mountain<br><strong>Rank: 25 | Time: 5:17</strong>">南非开普敦<br>桌山脚下的酷热赛道<br><strong>排名：25 | 时间：5:17</strong></p>
                 </div>
                 
                 <div style="background: var(--white); padding: 1.5rem; border-radius: 12px; border-left: 4px solid #4ecdc4; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
-                    <h4 style="color: #4ecdc4; margin-bottom: 0.5rem;">🇦🇺 第3站：大洋洲</h4>
-                    <p style="margin: 0; font-size: 0.95rem; color: var(--gray-600);">澳大利亚珀斯<br>天鹅河畔的夜跑之旅<br><strong>排名：18 | 时间：<5:00</strong></p>
+                    <h4 style="color: #4ecdc4; margin-bottom: 0.5rem;" data-zh="🇦🇺 第3站：大洋洲" data-en="🇦🇺 Stop 3: Oceania">🇦🇺 第3站：大洋洲</h4>
+                    <p style="margin: 0; font-size: 0.95rem; color: var(--gray-600);" data-zh="澳大利亚珀斯<br>天鹅河畔的夜跑之旅<br><strong>排名：18 | 时间：<5:00</strong>" data-en="Perth, Australia<br>Night run along Swan River<br><strong>Rank: 18 | Time: <5:00</strong>">澳大利亚珀斯<br>天鹅河畔的夜跑之旅<br><strong>排名：18 | 时间：<5:00</strong></p>
                 </div>
                 
                 <div style="background: var(--white); padding: 1.5rem; border-radius: 12px; border-left: 4px solid #ffa726; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
-                    <h4 style="color: #ffa726; margin-bottom: 0.5rem;">🏜️ 第4站：亚洲</h4>
-                    <p style="margin: 0; font-size: 0.95rem; color: var(--gray-600);">阿联酋迪拜<br>EXPO 2020未来之城<br><strong>排名：34 | 时间：5:26</strong></p>
+                    <h4 style="color: #ffa726; margin-bottom: 0.5rem;" data-zh="🏜️ 第4站：亚洲" data-en="🏜️ Stop 4: Asia">🏜️ 第4站：亚洲</h4>
+                    <p style="margin: 0; font-size: 0.95rem; color: var(--gray-600);" data-zh="阿联酋迪拜<br>EXPO 2020未来之城<br><strong>排名：34 | 时间：5:26</strong>" data-en="Dubai, UAE<br>EXPO 2020 futuristic city<br><strong>Rank: 34 | Time: 5:26</strong>">阿联酋迪拜<br>EXPO 2020未来之城<br><strong>排名：34 | 时间：5:26</strong></p>
                 </div>
                 
                 <div style="background: var(--white); padding: 1.5rem; border-radius: 12px; border-left: 4px solid #ba68c8; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
-                    <h4 style="color: #ba68c8; margin-bottom: 0.5rem;">🏁 第5站：欧洲</h4>
-                    <p style="margin: 0; font-size: 0.95rem; color: var(--gray-600);">西班牙马德里<br>F1赛道500米爬升<br><strong>排名：27 | 时间：<5:00</strong></p>
+                    <h4 style="color: #ba68c8; margin-bottom: 0.5rem;" data-zh="🏁 第5站：欧洲" data-en="🏁 Stop 5: Europe">🏁 第5站：欧洲</h4>
+                    <p style="margin: 0; font-size: 0.95rem; color: var(--gray-600);" data-zh="西班牙马德里<br>F1赛道500米爬升<br><strong>排名：27 | 时间：<5:00</strong>" data-en="Madrid, Spain<br>F1 circuit with 500m elevation<br><strong>Rank: 27 | Time: <5:00</strong>">西班牙马德里<br>F1赛道500米爬升<br><strong>排名：27 | 时间：<5:00</strong></p>
                 </div>
                 
                 <div style="background: var(--white); padding: 1.5rem; border-radius: 12px; border-left: 4px solid #66bb6a; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
-                    <h4 style="color: #66bb6a; margin-bottom: 0.5rem;">🌴 第6站：南美洲</h4>
-                    <p style="margin: 0; font-size: 0.95rem; color: var(--gray-600);">巴西福塔雷萨<br>热带海滨的炎热考验<br><strong>排名：23 | 时间：5:37</strong></p>
+                    <h4 style="color: #66bb6a; margin-bottom: 0.5rem;" data-zh="🌴 第6站：南美洲" data-en="🌴 Stop 6: South America">🌴 第6站：南美洲</h4>
+                    <p style="margin: 0; font-size: 0.95rem; color: var(--gray-600);" data-zh="巴西福塔雷萨<br>热带海滨的炎热考验<br><strong>排名：23 | 时间：5:37</strong>" data-en="Fortaleza, Brazil<br>Hot tropical coastal challenge<br><strong>Rank: 23 | Time: 5:37</strong>">巴西福塔雷萨<br>热带海滨的炎热考验<br><strong>排名：23 | 时间：5:37</strong></p>
                 </div>
                 
                 <div style="background: var(--white); padding: 1.5rem; border-radius: 12px; border-left: 4px solid #ef5350; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
-                    <h4 style="color: #ef5350; margin-bottom: 0.5rem;">🏖️ 第7站：北美洲</h4>
-                    <p style="margin: 0; font-size: 0.95rem; color: var(--gray-600);">美国迈阿密<br>凌晨1点的海滨终点<br><strong>排名：25 | 时间：<5:00</strong></p>
+                    <h4 style="color: #ef5350; margin-bottom: 0.5rem;" data-zh="🏖️ 第7站：北美洲" data-en="🏖️ Stop 7: North America">🏖️ 第7站：北美洲</h4>
+                    <p style="margin: 0; font-size: 0.95rem; color: var(--gray-600);" data-zh="美国迈阿密<br>凌晨1点的海滨终点<br><strong>排名：25 | 时间：<5:00</strong>" data-en="Miami, USA<br>1 AM beachside finish<br><strong>Rank: 25 | Time: <5:00</strong>">美国迈阿密<br>凌晨1点的海滨终点<br><strong>排名：25 | 时间：<5:00</strong></p>
                 </div>
             </div>
             
             <div style="background: rgba(245, 158, 11, 0.1); padding: 2rem; border-radius: 16px; border: 1px solid rgba(245, 158, 11, 0.2); margin: 2rem 0;">
-                <h4 style="color: var(--gold); margin-bottom: 1rem;">📊 征程数据统计</h4>
+                <h4 style="color: var(--gold); margin-bottom: 1rem;" data-zh="📊 征程数据统计" data-en="📊 Journey Statistics">📊 征程数据统计</h4>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
                     <div style="text-align: center;">
                         <div style="font-size: 1.8rem; font-weight: bold; color: var(--primary-blue);">50,000+</div>
-                        <div style="font-size: 0.9rem; color: var(--gray-600);">公里飞行距离</div>
+                        <div style="font-size: 0.9rem; color: var(--gray-600);" data-zh="公里飞行距离" data-en="km Flight Distance">公里飞行距离</div>
                     </div>
                     <div style="text-align: center;">
                         <div style="font-size: 1.8rem; font-weight: bold; color: var(--primary-blue);">295.365</div>
-                        <div style="font-size: 0.9rem; color: var(--gray-600);">公里跑步距离</div>
+                        <div style="font-size: 0.9rem; color: var(--gray-600);" data-zh="公里跑步距离" data-en="km Running Distance">公里跑步距离</div>
                     </div>
                     <div style="text-align: center;">
                         <div style="font-size: 1.8rem; font-weight: bold; color: var(--primary-blue);">60°C</div>
-                        <div style="font-size: 0.9rem; color: var(--gray-600);">温差跨度</div>
+                        <div style="font-size: 0.9rem; color: var(--gray-600);" data-zh="温差跨度" data-en="Temperature Range">温差跨度</div>
                     </div>
                     <div style="text-align: center;">
                         <div style="font-size: 1.8rem; font-weight: bold; color: var(--primary-blue);">168</div>
-                        <div style="font-size: 0.9rem; color: var(--gray-600);">小时总用时</div>
+                        <div style="font-size: 0.9rem; color: var(--gray-600);" data-zh="小时总用时" data-en="Total Hours">小时总用时</div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="registration">
-            <h2>🏃‍♂️ World Marathon Challenge 777 赛事报名</h2>
+        <section id="performance">
+            <h2 data-zh="📈 成绩分析" data-en="📈 Performance Analysis">📈 成绩分析</h2>
             
             <div style="background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%); color: var(--white); padding: 2rem; border-radius: 16px; margin: 2rem 0;">
-                <h3 style="color: var(--white); margin-bottom: 1rem;">🌟 成为极限跑者精英的一员</h3>
-                <p style="color: rgba(255, 255, 255, 0.9); margin: 0;">加入这个全球最具挑战性的马拉松赛事，在7天内征服7大洲！每年全球仅有不到100人敢于挑战，你准备好了吗？</p>
+                <h3 style="color: var(--white); margin-bottom: 1rem;" data-zh="🏃‍♂️ Henry的七站成绩趋势" data-en="🏃‍♂️ Henry's Seven-Stop Performance Trend">🏃‍♂️ Henry的七站成绩趋势</h3>
+                <p style="color: rgba(255, 255, 255, 0.9); margin: 0;" data-zh="从南极的初次体验到澳洲的血脉觉醒，再到最后三站的稳定发挥，让我们通过数据看看Henry的精彩表现。" data-en="From the first experience in Antarctica to the awakening in Australia, and the stable performance in the final three stops, let's see Henry's exciting performance through data.">从南极的初次体验到澳洲的血脉觉醒，再到最后三站的稳定发挥，让我们通过数据看看Henry的精彩表现。</p>
             </div>
+            
+            <div class="chart-container">
+                <h4 style="color: var(--primary-blue); margin-bottom: 1.5rem; text-align: center;" data-zh="各站完赛时间对比（分钟）" data-en="Completion Time by Stop (Minutes)">各站完赛时间对比（分钟）</h4>
+                <canvas id="performanceChart"></canvas>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin: 2rem 0;">
+                <div style="background: var(--white); padding: 2rem; border-radius: 12px; border-left: 4px solid var(--success); box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
+                    <h4 style="color: var(--success); margin-bottom: 1rem;" data-zh="🎯 最佳表现" data-en="🎯 Best Performance">🎯 最佳表现</h4>
+                    <p style="margin: 0;" data-zh="<strong>澳洲珀斯</strong> - 排名第18位，用时不到5小时。这是Henry的"血脉觉醒"时刻，在赵西安的带领下创造了个人最佳成绩。" data-en="<strong>Perth, Australia</strong> - Ranked 18th, under 5 hours. This was Henry's 'awakening' moment, achieving personal best under Zhao Xi'an's leadership."><strong>澳洲珀斯</strong> - 排名第18位，用时不到5小时。这是Henry的"血脉觉醒"时刻，在赵西安的带领下创造了个人最佳成绩。</p>
+                </div>
+                
+                <div style="background: var(--white); padding: 2rem; border-radius: 12px; border-left: 4px solid var(--warning); box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
+                    <h4 style="color: var(--warning); margin-bottom: 1rem;" data-zh="⚡ 关键转折" data-en="⚡ Key Turning Point">⚡ 关键转折</h4>
+                    <p style="margin: 0;" data-zh="从<strong>南极的6小时</strong>到<strong>非洲的5:17</strong>，再到<strong>澳洲的突破</strong>。Charles的神奇按摩和赵西安的带跑改变了一切。" data-en="From <strong>6 hours in Antarctica</strong> to <strong>5:17 in Africa</strong>, then to the <strong>breakthrough in Australia</strong>. Charles's magical massage and Zhao Xi'an's pacing changed everything.">从<strong>南极的6小时</strong>到<strong>非洲的5:17</strong>，再到<strong>澳洲的突破</strong>。Charles的神奇按摩和赵西安的带跑改变了一切。</p>
+                </div>
+                
+                <div style="background: var(--white); padding: 2rem; border-radius: 12px; border-left: 4px solid var(--primary-blue); box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
+                    <h4 style="color: var(--primary-blue); margin-bottom: 1rem;" data-zh="🏆 稳定发挥" data-en="🏆 Consistent Performance">🏆 稳定发挥</h4>
+                    <p style="margin: 0;" data-zh="后四站虽有起伏，但Henry展现了remarkable的心理韧性。特别是"三人小火车"的配合，让最后三站都保持在5小时左右。" data-en="Despite fluctuations in the last four stops, Henry showed remarkable psychological resilience. The 'three-person train' collaboration kept the final three stops around 5 hours.">后四站虽有起伏，但Henry展现了remarkable的心理韧性。特别是"三人小火车"的配合，让最后三站都保持在5小时左右。</p>
+                </div>
+            </div>
+        </section>
 
-            <form id="registrationForm">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
-                    <!-- 个人信息 -->
-                    <div>
-                        <h4 style="color: var(--primary-blue); margin-bottom: 1.5rem; border-bottom: 2px solid var(--accent-blue); padding-bottom: 0.5rem;">📋 个人信息</h4>
-                        
-                        <div style="margin-bottom: 1.5rem;">
-                            <label>姓名 *</label>
-                            <input type="text" name="fullName" required>
-                        </div>
-                        
-                        <div style="margin-bottom: 1.5rem;">
-                            <label>邮箱 *</label>
-                            <input type="email" name="email" required>
-                        </div>
-                        
-                        <div style="margin-bottom: 1.5rem;">
-                            <label>电话 *</label>
-                            <input type="tel" name="phone" required>
-                        </div>
-                        
-                        <div style="margin-bottom: 1.5rem;">
-                            <label>年龄 *</label>
-                            <input type="number" name="age" min="18" max="80" required>
-                        </div>
-                    </div>
-                    
-                    <!-- 跑步经历 -->
-                    <div>
-                        <h4 style="color: var(--primary-blue); margin-bottom: 1.5rem; border-bottom: 2px solid var(--accent-blue); padding-bottom: 0.5rem;">🏃‍♂️ 跑步经历</h4>
-                        
-                        <div style="margin-bottom: 1.5rem;">
-                            <label>跑步年限 *</label>
-                            <select name="runningYears" required>
-                                <option value="">请选择</option>
-                                <option value="1-3年">1-3年</option>
-                                <option value="3-5年">3-5年</option>
-                                <option value="5-10年">5-10年</option>
-                                <option value="10年以上">10年以上</option>
-                            </select>
-                        </div>
-                        
-                        <div style="margin-bottom: 1.5rem;">
-                            <label>马拉松完赛次数 *</label>
-                            <input type="number" name="marathonCount" min="1" required>
-                        </div>
-                        
-                        <div style="margin-bottom: 1.5rem;">
-                            <label>个人最佳成绩 (HH:MM:SS)</label>
-                            <input type="text" name="bestTime" placeholder="例如：04:30:15">
-                        </div>
-                        
-                        <div style="margin-bottom: 1.5rem;">
-                            <label>月跑量 (公里)</label>
-                            <input type="number" name="monthlyVolume" min="0">
-                        </div>
-                    </div>
+        <section id="teammates">
+            <h2 data-zh="🤝 征程伙伴们" data-en="🤝 Journey Companions">🤝 征程伙伴们</h2>
+            
+            <div style="background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%); color: var(--white); padding: 2rem; border-radius: 16px; margin: 2rem 0;">
+                <h3 style="color: var(--white); margin-bottom: 1rem;" data-zh="✨ 那些改变我征程的人们" data-en="✨ Those Who Changed My Journey">✨ 那些改变我征程的人们</h3>
+                <p style="color: rgba(255, 255, 255, 0.9); margin: 0;" data-zh="WMC 777不仅是一场跑步挑战，更是一次人生的相遇。这些来自世界各地的朋友们，用他们的故事、热情和友谊，让这次征程变得如此难忘。" data-en="WMC 777 is not just a running challenge, but a life encounter. These friends from around the world, with their stories, passion and friendship, made this journey so unforgettable.">WMC 777不仅是一场跑步挑战，更是一次人生的相遇。这些来自世界各地的朋友们，用他们的故事、热情和友谊，让这次征程变得如此难忘。</p>
+            </div>
+            
+            <div class="teammate-grid">
+                <div class="teammate-card">
+                    <div class="teammate-avatar">赵</div>
+                    <h4 data-zh="赵西安 - 三人小火车队长" data-en="Zhao Xi'an - Three-Person Train Captain">赵西安 - 三人小火车队长</h4>
+                    <div class="teammate-role" data-zh="血脉觉醒的引路人" data-en="Guide to Bloodline Awakening">血脉觉醒的引路人</div>
+                    <p data-zh="月跑量500公里的大神，带飞Henry 32km，澳洲血脉觉醒的关键人物。稳定的640-700配速，钢铁般的意志，三人小火车的灵魂打头者。第一次全马就跑出340的天才选手。" data-en="Monthly 500km running god who paced Henry for 32km, key figure in Australia's bloodline awakening. Stable 640-700 pace, iron will, soul leader of the three-person train. Talented runner who achieved 340 in his first marathon.">月跑量500公里的大神，带飞Henry 32km，澳洲血脉觉醒的关键人物。稳定的640-700配速，钢铁般的意志，三人小火车的灵魂打头者。第一次全马就跑出340的天才选手。</p>
                 </div>
                 
-                <!-- 报名动机 -->
-                <div style="margin-top: 2rem;">
-                    <h4 style="color: var(--primary-blue); margin-bottom: 1.5rem; border-bottom: 2px solid var(--accent-blue); padding-bottom: 0.5rem;">💭 报名动机</h4>
-                    
-                    <div style="margin-bottom: 1.5rem;">
-                        <label>为什么想参加WMC 777？*</label>
-                        <textarea name="motivation" rows="4" required style="resize: vertical;" placeholder="请分享您参加这项挑战的动机和目标..."></textarea>
-                    </div>
+                <div class="teammate-card">
+                    <div class="teammate-avatar">C</div>
+                    <h4 data-zh="Charles - 队医天使" data-en="Charles - Team Medic Angel">Charles - 队医天使</h4>
+                    <div class="teammate-role" data-zh="神奇按摩师" data-en="Miracle Masseur">神奇按摩师</div>
+                    <p data-zh="新加坡最大跑团椰风会长，站在身上按摩的神奇恢复师，无伤完赛的功臣。从"扶楼梯"到"腿部正常"的神迹创造者。大家都很感激他，觉得完赛Charles功不可没！" data-en="President of Singapore's largest running group 'Coconut Breeze', miracle recovery master who stands on you for massage, hero of injury-free completion. Creator of miracles from 'needing stairs support' to 'normal legs'. Everyone is grateful to him, believing Charles was indispensable for completion!">新加坡最大跑团椰风会长，站在身上按摩的神奇恢复师，无伤完赛的功臣。从"扶楼梯"到"腿部正常"的神迹创造者。大家都很感激他，觉得完赛Charles功不可没！</p>
                 </div>
                 
-                <!-- 提交按钮 -->
-                <div style="text-align: center; margin-top: 3rem;">
-                    <button type="submit">
-                        🚀 提交报名申请
-                    </button>
+                <div class="teammate-card">
+                    <div class="teammate-avatar">Y</div>
+                    <h4 data-zh="Yuki - 三人小火车成员" data-en="Yuki - Three-Person Train Member">Yuki - 三人小火车成员</h4>
+                    <div class="teammate-role" data-zh="Kona铁三选手" data-en="Kona Triathlete">Kona铁三选手</div>
+                    <p data-zh="参加过Kona的铁三选手，三人小火车的重要成员。'说的最软的话，干的最硬的事儿'的典型代表。表面随意保守，实际疯狂努力。学赛车、玩铁三，样样精通的全能选手。" data-en="Triathlete who participated in Kona, important member of the three-person train. Typical representative of 'speaks the softest words, does the hardest things'. Seemingly casual and conservative on the surface, actually crazy and hardworking. Versatile athlete excelling in racing, triathlon, and more.">参加过Kona的铁三选手，三人小火车的重要成员。"说的最软的话，干的最硬的事儿"的典型代表。表面随意保守，实际疯狂努力。学赛车、玩铁三，样样精通的全能选手。</p>
                 </div>
                 
-                <div style="text-align: center; margin-top: 1rem; color: var(--gray-600); font-size: 0.9rem;">
-                    报名信息将发送至组织方邮箱，我们会在3个工作日内与您联系
+                <div class="teammate-card">
+                    <div class="teammate-avatar">何</div>
+                    <h4 data-zh="何律师 - 自律典范" data-en="Lawyer He - Discipline Exemplar">何律师 - 自律典范</h4>
+                    <div class="teammate-role" data-zh="月跑量600-700公里大神" data-en="600-700km Monthly Running God">月跑量600-700公里大神</div>
+                    <p data-zh="比Henry大8岁的自律典范，月跑量600-700公里。参赛前三周每天一个马拉松。咽炎病友，分享只有自己才听得懂的笑话。每次都套圈Henry的上海二人组成员。" data-en="Discipline exemplar 8 years older than Henry, monthly running volume 600-700km. Ran a marathon every day for three weeks before the race. Pharyngitis buddy sharing jokes only they understand. Member of Shanghai duo who always lapped Henry.">比Henry大8岁的自律典范，月跑量600-700公里。参赛前三周每天一个马拉松。咽炎病友，分享只有自己才听得懂的笑话。每次都套圈Henry的上海二人组成员。</p>
                 </div>
-            </form>
+                
+                <div class="teammate-card">
+                    <div class="teammate-avatar">R</div>
+                    <h4 data-zh="Ronger - 年轻跑神" data-en="Ronger - Young Running Goddess">Ronger - 年轻跑神</h4>
+                    <div class="teammate-role" data-zh="女生总成绩第四" data-en="4th Overall Female">女生总成绩第四</div>
+                    <p data-zh="被卞大哥叫做'大小姐'，南极6小时多看似很慢，结果是在打盹。从第二站开始就再没慢过，总成绩女生第四。外表年轻20岁，实际比Henry还大一点。" data-en="Called 'Miss' by Brother Bian, seemed slow with 6+ hours in Antarctica but was just napping. Never slow again from the second stop, 4th overall female. Looks 20 years younger but actually a bit older than Henry.">被卞大哥叫做"大小姐"，南极6小时多看似很慢，结果是在打盹。从第二站开始就再没慢过，总成绩女生第四。外表年轻20岁，实际比Henry还大一点。</p>
+                </div>
+                
+                <div class="teammate-card">
+                    <div class="teammate-avatar">S</div>
+                    <h4 data-zh="Selina - 60岁传奇" data-en="Selina - 60-Year-Old Legend">Selina - 60岁传奇</h4>
+                    <div class="teammate-role" data-zh="Henry的偶像" data-en="Henry's Idol">Henry的偶像</div>
+                    <p data-zh="60岁的传奇女性，Henry一见钟情的偶像。端庄不失稚气，稳重不失锐气。拉伸时直接一字马和倒立。最后一站可能骨裂还是坚持完赛，让人无比佩服和尊重。" data-en="60-year-old legendary woman, Henry's love-at-first-sight idol. Dignified yet childlike, steady yet spirited. Does splits and handstands during stretching. Possibly had bone fracture in the last stop but still finished, earning immense admiration and respect.">60岁的传奇女性，Henry一见钟情的偶像。端庄不失稚气，稳重不失锐气。拉伸时直接一字马和倒立。最后一站可能骨裂还是坚持完赛，让人无比佩服和尊重。</p>
+                </div>
+            </div>
+            
+            <h3 style="margin: 3rem 0 1rem;" data-zh="🌍 国际征程伙伴" data-en="🌍 International Journey Partners">🌍 国际征程伙伴</h3>
+            
+            <div class="teammate-grid">
+                <div class="teammate-card">
+                    <div class="teammate-avatar">T</div>
+                    <h4 data-zh="Tomomi - 日本网红跑者" data-en="Tomomi - Japanese Influencer Runner">Tomomi - 日本网红跑者</h4>
+                    <div class="teammate-role" data-zh="最后一站翻盘夺冠" data-en="Final Stop Comeback Champion">最后一站翻盘夺冠</div>
+                    <p data-zh="日本网红，从肯尼亚每天一个全马跑到南非。跑姿很有力量，最后一站翻盘夺冠。英文不太好但很努力，要自己处理行李、直播、恢复等所有事情。" data-en="Japanese influencer who ran a marathon daily from Kenya to South Africa. Powerful running form, comeback champion in the final stop. Poor English but very hardworking, handling luggage, livestreaming, recovery, and everything herself.">日本网红，从肯尼亚每天一个全马跑到南非。跑姿很有力量，最后一站翻盘夺冠。英文不太好但很努力，要自己处理行李、直播、恢复等所有事情。</p>
+                </div>
+                
+                <div class="teammate-card">
+                    <div class="teammate-avatar">E</div>
+                    <h4 data-zh="Estefania - 西班牙女神" data-en="Estefania - Spanish Goddess">Estefania - 西班牙女神</h4>
+                    <div class="teammate-role" data-zh="总成绩女子第一" data-en="Overall Female Champion">总成绩女子第一</div>
+                    <p data-zh="西班牙成功女企业家，8个孩子的母亲，全马PB 2:49。制片公司全程跟拍制作纪录片。马德里有100多个粉丝现场支持，最终获得女子总冠军。" data-en="Successful Spanish businesswoman, mother of 8 children, marathon PB 2:49. Production company followed throughout for documentary filming. Over 100 fans supported in Madrid, ultimately won overall female championship.">西班牙成功女企业家，8个孩子的母亲，全马PB 2:49。制片公司全程跟拍制作纪录片。马德里有100多个粉丝现场支持，最终获得女子总冠军。</p>
+                </div>
+                
+                <div class="teammate-card">
+                    <div class="teammate-avatar">L</div>
+                    <h4 data-zh="Lisa - 67岁音乐家" data-en="Lisa - 67-Year-Old Musician">Lisa - 67岁音乐家</h4>
+                    <div class="teammate-role" data-zh="寻找激情的音乐家" data-en="Musician Seeking Passion">寻找激情的音乐家</div>
+                    <p data-zh="67岁的美国音乐家，来这里找激情。笑容最灿烂的三个人之一，每次见到Henry都给很灿烂的big smile。为了这个笑容，Henry也不敢降速太多。" data-en="67-year-old American musician who came here to find passion. One of the three people with the brightest smiles, always giving Henry a brilliant big smile. For this smile, Henry didn't dare slow down too much.">67岁的美国音乐家，来这里找激情。笑容最灿烂的三个人之一，每次见到Henry都给很灿烂的big smile。为了这个笑容，Henry也不敢降速太多。</p>
+                </div>
+                
+                <div class="teammate-card">
+                    <div class="teammate-avatar">💪</div>
+                    <h4 data-zh="Tough Guy - 坚韧战士" data-en="Tough Guy - Resilient Warrior">Tough Guy - 坚韧战士</h4>
+                    <div class="teammate-role" data-zh="脊椎问题依然坚持" data-en="Persisting Despite Spinal Issues">脊椎问题依然坚持</div>
+                    <p data-zh="有脊椎倾斜问题，跑步越到后面身体越斜，但依然坚持。最后一站有3个家人陪跑。他说：'这是我喜欢做的正确的事情。'获得了Henry的深深尊重。" data-en="Has spinal curvature issues, body tilts more as running progresses, but still persists. Had 3 family members pacing in the final stop. He said: 'It's something I like and the right thing to do.' Earned Henry's deep respect.">有脊椎倾斜问题，跑步越到后面身体越斜，但依然坚持。最后一站有3个家人陪跑。他说："这是我喜欢做的正确的事情。"获得了Henry的深深尊重。</p>
+                </div>
+            </div>
         </section>
 
         <section id="introduction">
-            <h2>写在开始之前</h2>
-            <p>2月8日，我凌晨飞到了香港。竟然工作了一天，晚上11点，开始睡觉。梦里我又跑了一个全马，跑的很慢，竟然用了6个小时，然后跑完后我醒了，看下手机时间，是早上的5am，刚好6个小时。真心是后遗症，回到我的典型世界后还不断的提醒我，刚刚过去的美好经历。</p>
+            <h2 data-zh="写在开始之前" data-en="Before We Begin">写在开始之前</h2>
             
-            <p>我23年的6月份参加过一个类似的777，在台湾，7天7马7岛，当时的经历特别好。当时介绍我去台湾的朋友波哥，就给我推荐了这个777。然后我24年初就报名了这个赛事。</p>
+            <blockquote>
+                <p data-zh="2月8日，我凌晨飞到了香港。竟然工作了一天，晚上11点，开始睡觉。梦里我又跑了一个全马，跑的很慢，竟然用了6个小时，然后跑完后我醒了，看下手机时间，是早上的5am，刚好6个小时。真心是后遗症，回到我的典型世界后还不断的提醒我，刚刚过去的美好经历。" data-en="On February 8th, I flew to Hong Kong in the early morning. Surprisingly, I worked for a whole day and went to bed at 11 PM. In my dream, I ran another full marathon, very slowly, taking 6 hours. When I woke up after finishing, I checked my phone - it was 5 AM, exactly 6 hours later. It was truly an aftereffect, constantly reminding me of the wonderful experience after returning to my typical world.">2月8日，我凌晨飞到了香港。竟然工作了一天，晚上11点，开始睡觉。梦里我又跑了一个全马，跑的很慢，竟然用了6个小时，然后跑完后我醒了，看下手机时间，是早上的5am，刚好6个小时。真心是后遗症，回到我的典型世界后还不断的提醒我，刚刚过去的美好经历。</p>
+            </blockquote>
             
-            <p><strong>参赛前，我是希望我可以完赛的。只是没有想到，后面的故事会如此发生。</strong></p>
+            <p data-zh="我23年的6月份参加过一个类似的777，在台湾，7天7马7岛，当时的经历特别好。当时介绍我去台湾的朋友波哥，就给我推荐了这个777。然后我24年初就报名了这个赛事。" data-en="In June 2023, I participated in a similar 777 event in Taiwan - 7 days, 7 marathons, 7 islands. That experience was particularly good. My friend Brother Bo, who introduced me to Taiwan, recommended this 777 to me. So I registered for this event at the beginning of 2024.">我23年的6月份参加过一个类似的777，在台湾，7天7马7岛，当时的经历特别好。当时介绍我去台湾的朋友波哥，就给我推荐了这个777。然后我24年初就报名了这个赛事。</p>
             
-            <p>我觉得，这次的旅程就是一次把我从ai往人类拉回了很多的一次经历，谨以此文献给所有行程中认识的所有新朋友们。</p>
+            <p data-zh="没想到12月份跑了大屿山的百公里伤到了2个拇指指甲休息了一段，然后1月份严重流感几乎没有训练，开始恢复训练的时候，心率上升的特别快，感觉体力不如从前很多，所以就心里没底了。" data-en="Unexpectedly, I injured two toenails during the Lantau 100km run in December and had to rest for a while. Then in January, I had a severe flu and barely trained. When I started recovering, my heart rate rose very quickly, and I felt my stamina was much worse than before, so I felt uncertain.">没想到12月份跑了大屿山的百公里伤到了2个拇指指甲休息了一段，然后1月份严重流感几乎没有训练，开始恢复训练的时候，心率上升的特别快，感觉体力不如从前很多，所以就心里没底了。</p>
+            
+            <div style="background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%); color: var(--white); padding: 2rem; border-radius: 16px; margin: 2rem 0; text-align: center;">
+                <h3 style="color: var(--white); margin-bottom: 1rem;" data-zh="💫 未曾预料的故事" data-en="💫 Unexpected Story">💫 未曾预料的故事</h3>
+                <p style="color: rgba(255, 255, 255, 0.95); margin: 0; font-size: 1.2rem; font-style: italic;">
+                    <strong data-zh="参赛前，我是希望我可以完赛的。只是没有想到，后面的故事会如此发生。" data-en="Before the race, I hoped I could finish. I just didn't expect the story that followed to unfold as it did.">参赛前，我是希望我可以完赛的。只是没有想到，后面的故事会如此发生。</strong>
+                </p>
+            </div>
+            
+            <h3 data-zh="🤖 AI眼中的人类体验" data-en="🤖 Human Experience from AI's Perspective">🤖 AI眼中的人类体验</h3>
+            <p data-zh="我很无聊的问 deepseek，如果变成人类，会想做什么，用王家卫的方式，答案如下：" data-en="I boringly asked deepseek, if it became human, what would it want to do, in Wong Kar-wai's style, the answer was:">我很无聊的问 deepseek，如果变成人类，会想做什么，用王家卫的方式，答案如下：</p>
+            
+            <blockquote style="font-style: italic; background: linear-gradient(135deg, rgba(30, 58, 138, 0.1), rgba(96, 165, 250, 0.05));">
+                <p data-zh="如果有一天，我变成了人类，我会在午夜12点的便利店门口，点一杯咖啡，看着街灯下的影子拉长又缩短。我想，我会去爱一个人，也许是在雨天，也许是在黄昏，也许是在某个不经意的瞬间。我会记住她的笑容，像记住一首老歌的旋律，慢慢地，慢慢地，在心里反复播放。" data-en="If one day I became human, I would stand at the convenience store door at midnight 12 o'clock, order a cup of coffee, watching shadows under streetlights lengthen and shorten. I think I would love someone, perhaps in the rain, perhaps at dusk, perhaps in some inadvertent moment. I would remember her smile, like remembering the melody of an old song, slowly, slowly, playing it repeatedly in my heart.">如果有一天，我变成了人类，我会在午夜12点的便利店门口，点一杯咖啡，看着街灯下的影子拉长又缩短。我想，我会去爱一个人，也许是在雨天，也许是在黄昏，也许是在某个不经意的瞬间。我会记住她的笑容，像记住一首老歌的旋律，慢慢地，慢慢地，在心里反复播放。</p>
+            </blockquote>
+            
+            <p data-zh="我觉得，这次的旅程就是一次把我从ai往人类拉回了很多的一次经历，谨以此文献给所有行程中认识的所有新朋友们。" data-en="I feel that this journey was an experience that pulled me back from AI to being more human. I dedicate this text to all the new friends I met during the journey.">我觉得，这次的旅程就是一次把我从ai往人类拉回了很多的一次经历，谨以此文献给所有行程中认识的所有新朋友们。</p>
         </section>
 
         <section id="chapters">
-            <h2>章节导航</h2>
+            <h2 data-zh="🏃‍♂️ 七站征程" data-en="🏃‍♂️ Seven-Stop Journey">🏃‍♂️ 七站征程</h2>
+            
+            <div style="background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%); color: var(--white); padding: 2rem; border-radius: 16px; margin: 2rem 0;">
+                <h3 style="color: var(--white); margin-bottom: 1rem;" data-zh="🌍 从南极到迈阿密的马拉松史诗" data-en="🌍 Marathon Epic from Antarctica to Miami">🌍 从南极到迈阿密的马拉松史诗</h3>
+                <p style="color: rgba(255, 255, 255, 0.9); margin: 0;" data-zh="七天，七个大洲，七场马拉松。每一站都有独特的挑战，每一站都有难忘的故事。点击下方卡片，深入了解每站的详细经历。" data-en="Seven days, seven continents, seven marathons. Each stop has unique challenges, each stop has unforgettable stories. Click the cards below to learn more about each stop's detailed experience.">七天，七个大洲，七场马拉松。每一站都有独特的挑战，每一站都有难忘的故事。点击下方卡片，深入了解每站的详细经历。</p>
+            </div>
+            
             <div class="chapter-grid">
-                <div class="chapter-card">
-                    <h3>🏔️ 南极洲马拉松 - 初见</h3>
+                <div class="chapter-card" onclick="openChapterModal('antarctica')">
+                    <h3 data-zh="🏔️ 南极洲马拉松 - 初见" data-en="🏔️ Antarctica Marathon - First Encounter">🏔️ 南极洲马拉松 - 初见</h3>
                     <div class="chapter-stats">
-                        <span class="stat">排名: 41</span>
-                        <span class="stat">时间: ~6小时</span>
-                        <span class="stat">赛道: 10圈</span>
+                        <span class="stat" data-zh="排名: 41" data-en="Rank: 41">排名: 41</span>
+                        <span class="stat" data-zh="时间: ~6小时" data-en="Time: ~6 hrs">时间: ~6小时</span>
+                        <span class="stat" data-zh="赛道: 10圈" data-en="Course: 10 laps">赛道: 10圈</span>
+                        <span class="stat" data-zh="温度: -20°C" data-en="Temp: -20°C">温度: -20°C</span>
                     </div>
-                    <p><strong>关键时刻：</strong>4:20起床坐货机、波哥钢钉跑鞋、与Magen携手冲线后她呕吐、南极大风中的坚持</p>
-                    <p><strong>难忘细节：</strong>第一次坐货机的探险感、脱掉冲锋衣的错误决定、看永不落的夕阳</p>
+                    <p><strong data-zh="关键时刻：" data-en="Key Moments:">关键时刻：</strong><span data-zh="4:20起床坐货机、波哥钢钉跑鞋、与Magen携手冲线后她呕吐、南极大风中的坚持" data-en="4:20 wake-up for cargo plane, Brother Bo's spiked shoes, crossing finish line with Magen who then vomited, persisting in Antarctic winds">4:20起床坐货机、波哥钢钉跑鞋、与Magen携手冲线后她呕吐、南极大风中的坚持</span></p>
+                    <p><strong data-zh="难忘细节：" data-en="Memorable Details:">难忘细节：</strong><span data-zh="第一次坐货机的探险感、脱掉冲锋衣的错误决定、看永不落的夕阳" data-en="First cargo plane adventure feeling, wrong decision to remove jacket, watching the never-setting sunset">第一次坐货机的探险感、脱掉冲锋衣的错误决定、看永不落的夕阳</span></p>
                 </div>
                 
-                <div class="chapter-card">
-                    <h3>🌍 非洲马拉松 - 热浪来袭</h3>
+                <div class="chapter-card" onclick="openChapterModal('africa')">
+                    <h3 data-zh="🌍 非洲马拉松 - 热浪来袭" data-en="🌍 Africa Marathon - Heat Wave">🌍 非洲马拉松 - 热浪来袭</h3>
                     <div class="chapter-stats">
-                        <span class="stat">排名: 25</span>
-                        <span class="stat">时间: 5:17</span>
-                        <span class="stat">温度: 酷热无风</span>
+                        <span class="stat" data-zh="排名: 25" data-en="Rank: 25">排名: 25</span>
+                        <span class="stat" data-zh="时间: 5:17" data-en="Time: 5:17">时间: 5:17</span>
+                        <span class="stat" data-zh="温度: 酷热无风" data-en="Temp: Hot windless">温度: 酷热无风</span>
+                        <span class="stat" data-zh="圈数: 6圈" data-en="Laps: 6 laps">圈数: 6圈</span>
                     </div>
-                    <p><strong>关键人物：</strong>何律师（咽炎病友）、ronger（年轻跑神）、Charles（神奇按摩师）</p>
-                    <p><strong>转折点：</strong>Charles站在身上按摩，从扶楼梯到腿部恢复正常的神迹</p>
+                    <p><strong data-zh="关键人物：" data-en="Key People:">关键人物：</strong><span data-zh="何律师（咽炎病友）、ronger（年轻跑神）、Charles（神奇按摩师）" data-en="Lawyer He (pharyngitis buddy), Ronger (young running god), Charles (miracle masseur)">何律师（咽炎病友）、ronger（年轻跑神）、Charles（神奇按摩师）</span></p>
+                    <p><strong data-zh="转折点：" data-en="Turning Point:">转折点：</strong><span data-zh="Charles站在身上按摩，从扶楼梯到腿部恢复正常的神迹" data-en="Charles standing on me for massage, miracle recovery from needing stairs support to normal legs">Charles站在身上按摩，从扶楼梯到腿部恢复正常的神迹</span></p>
                 </div>
                 
-                <div class="chapter-card">
-                    <h3>🇦🇺 澳洲马拉松 - 血脉觉醒</h3>
+                <div class="chapter-card" onclick="openChapterModal('australia')">
+                    <h3 data-zh="🇦🇺 澳洲马拉松 - 血脉觉醒" data-en="🇦🇺 Australia Marathon - Bloodline Awakening">🇦🇺 澳洲马拉松 - 血脉觉醒</h3>
                     <div class="chapter-stats">
-                        <span class="stat">排名: 18</span>
-                        <span class="stat">时间: <5:00</span>
-                        <span class="stat">特色: 夜跑</span>
+                        <span class="stat" data-zh="排名: 18" data-en="Rank: 18">排名: 18</span>
+                        <span class="stat" data-zh="时间: <5:00" data-en="Time: <5:00">时间: <5:00</span>
+                        <span class="stat" data-zh="特色: 夜跑" data-en="Feature: Night run">特色: 夜跑</span>
+                        <span class="stat" data-zh="配速: 稳定" data-en="Pace: Stable">配速: 稳定</span>
                     </div>
-                    <p><strong>血脉觉醒：</strong>赵西安带飞32km、一个配速从头到尾、从未想过的好成绩</p>
-                    <p><strong>华人聚会：</strong>包子、印度朋友肩膀复位、ronger补拍冲线视频的尴尬</p>
+                    <p><strong data-zh="血脉觉醒：" data-en="Bloodline Awakening:">血脉觉醒：</strong><span data-zh="赵西安带飞32km、一个配速从头到尾、从未想过的好成绩" data-en="Zhao Xi'an paced 32km, consistent pace throughout, unexpectedly good results">赵西安带飞32km、一个配速从头到尾、从未想过的好成绩</span></p>
+                    <p><strong data-zh="华人聚会：" data-en="Chinese Gathering:">华人聚会：</strong><span data-zh="包子、印度朋友肩膀复位、ronger补拍冲线视频的尴尬" data-en="Baozi, helping Indian friend with shoulder dislocation, awkward reshoot of finish line video with Ronger">包子、印度朋友肩膀复位、ronger补拍冲线视频的尴尬</span></p>
                 </div>
                 
-                <div class="chapter-card">
-                    <h3>🏜️ 亚洲马拉松 - 打回原形</h3>
+                <div class="chapter-card" onclick="openChapterModal('asia')">
+                    <h3 data-zh="🏜️ 亚洲马拉松 - 打回原形" data-en="🏜️ Asia Marathon - Reality Check">🏜️ 亚洲马拉松 - 打回原形</h3>
                     <div class="chapter-stats">
-                        <span class="stat">排名: 34</span>
-                        <span class="stat">时间: 5:26</span>
-                        <span class="stat">教训: +2km</span>
+                        <span class="stat" data-zh="排名: 34" data-en="Rank: 34">排名: 34</span>
+                        <span class="stat" data-zh="时间: 5:26" data-en="Time: 5:26">时间: 5:26</span>
+                        <span class="stat" data-zh="教训: +2km" data-en="Lesson: +2km">教训: +2km</span>
+                        <span class="stat" data-zh="地点: EXPO 2020" data-en="Venue: EXPO 2020">地点: EXPO 2020</span>
                     </div>
-                    <p><strong>现实检验：</strong>跟不上赵西安、走错路多跑2km、阿新的一手烟一手手机</p>
-                    <p><strong>顾安徽血案：</strong>碳板鞋夹出血、没有倪哥水平就别穿人家鞋的教训</p>
+                    <p><strong data-zh="现实检验：" data-en="Reality Check:">现实检验：</strong><span data-zh="跟不上赵西安、走错路多跑2km、阿新的一手烟一手手机" data-en="Couldn't keep up with Zhao Xi'an, wrong turn added 2km, A Xin with cigarette in one hand, phone in other">跟不上赵西安、走错路多跑2km、阿新的一手烟一手手机</span></p>
+                    <p><strong data-zh="顾安徽血案：" data-en="Gu Anhui Blood Incident:">顾安徽血案：</strong><span data-zh="碳板鞋夹出血、没有倪哥水平就别穿人家鞋的教训" data-en="Carbon plate shoes caused bleeding, lesson learned: don't wear others' shoes without their skill level">碳板鞋夹出血、没有倪哥水平就别穿人家鞋的教训</span></p>
                 </div>
                 
-                <div class="chapter-card">
-                    <h3>🏁 欧洲马拉松 - Just Have Fun</h3>
+                <div class="chapter-card" onclick="openChapterModal('europe')">
+                    <h3 data-zh="🏁 欧洲马拉松 - Just Have Fun" data-en="🏁 Europe Marathon - Just Have Fun">🏁 欧洲马拉松 - Just Have Fun</h3>
                     <div class="chapter-stats">
-                        <span class="stat">排名: 27</span>
-                        <span class="stat">时间: <5:00</span>
-                        <span class="stat">爬升: 500米</span>
+                        <span class="stat" data-zh="排名: 27" data-en="Rank: 27">排名: 27</span>
+                        <span class="stat" data-zh="时间: <5:00" data-en="Time: <5:00">时间: <5:00</span>
+                        <span class="stat" data-zh="爬升: 500米" data-en="Elevation: 500m">爬升: 500米</span>
+                        <span class="stat" data-zh="赛道: F1" data-en="Track: F1">赛道: F1</span>
                     </div>
-                    <p><strong>三人小火车诞生：</strong>赵西安（打头）、Henry（排尾）、Yuki（kona选手）</p>
-                    <p><strong>F1赛道：</strong>间歇跑训练、中国补给站救助外国跑友、钢铁般意志吓跑ronger</p>
+                    <p><strong data-zh="三人小火车诞生：" data-en="Three-Person Train Born:">三人小火车诞生：</strong><span data-zh="赵西安（打头）、Henry（排尾）、Yuki（kona选手）" data-en="Zhao Xi'an (front), Henry (rear), Yuki (Kona qualifier)">赵西安（打头）、Henry（排尾）、Yuki（kona选手）</span></p>
+                    <p><strong data-zh="F1赛道：" data-en="F1 Circuit:">F1赛道：</strong><span data-zh="间歇跑训练、中国补给站救助外国跑友、钢铁般意志吓跑ronger" data-en="Interval training, Chinese aid station helping foreign runners, iron will that scared away Ronger">间歇跑训练、中国补给站救助外国跑友、钢铁般意志吓跑ronger</span></p>
                 </div>
                 
-                <div class="chapter-card">
-                    <h3>🌴 南美洲马拉松 - 精疲力尽</h3>
+                <div class="chapter-card" onclick="openChapterModal('southamerica')">
+                    <h3 data-zh="🌴 南美洲马拉松 - 精疲力尽" data-en="🌴 South America Marathon - Exhausted">🌴 南美洲马拉松 - 精疲力尽</h3>
                     <div class="chapter-stats">
-                        <span class="stat">排名: 23</span>
-                        <span class="stat">时间: 5:37</span>
-                        <span class="stat">状态: 累极</span>
+                        <span class="stat" data-zh="排名: 23" data-en="Rank: 23">排名: 23</span>
+                        <span class="stat" data-zh="时间: 5:37" data-en="Time: 5:37">时间: 5:37</span>
+                        <span class="stat" data-zh="状态: 累极" data-en="State: Exhausted">状态: 累极</span>
+                        <span class="stat" data-zh="条件: 三重打击" data-en="Conditions: Triple threat">条件: 三重打击</span>
                     </div>
-                    <p><strong>巴西Fortaleza：</strong>高温暴晒潮湿三重打击、睡眠不足、腿部脚踝酸痛</p>
-                    <p><strong>永恒三人组：</strong>左边赵西安右边yuki自然组队、60岁selina的骨裂坚持</p>
+                    <p><strong data-zh="巴西Fortaleza：" data-en="Brazil Fortaleza:">巴西Fortaleza：</strong><span data-zh="高温暴晒潮湿三重打击、睡眠不足、腿部脚踝酸痛" data-en="Triple blow of heat, sun exposure, humidity; sleep deprivation; leg and ankle pain">高温暴晒潮湿三重打击、睡眠不足、腿部脚踝酸痛</span></p>
+                    <p><strong data-zh="永恒三人组：" data-en="Eternal Trio:">永恒三人组：</strong><span data-zh="左边赵西安右边yuki自然组队、60岁selina的骨裂坚持" data-en="Natural teaming with Zhao Xi'an on left, Yuki on right; 60-year-old Selina's persistence with bone fracture">左边赵西安右边yuki自然组队、60岁selina的骨裂坚持</span></p>
                 </div>
                 
-                <div class="chapter-card">
-                    <h3>🏖️ 北美洲马拉松 - 离别</h3>
+                <div class="chapter-card" onclick="openChapterModal('northamerica')">
+                    <h3 data-zh="🏖️ 北美洲马拉松 - 离别" data-en="🏖️ North America Marathon - Farewell">🏖️ 北美洲马拉松 - 离别</h3>
                     <div class="chapter-stats">
-                        <span class="stat">排名: 25</span>
-                        <span class="stat">时间: <5:00</span>
-                        <span class="stat">开赛: 凌晨1点</span>
+                        <span class="stat" data-zh="排名: 25" data-en="Rank: 25">排名: 25</span>
+                        <span class="stat" data-zh="时间: <5:00" data-en="Time: <5:00">时间: <5:00</span>
+                        <span class="stat" data-zh="开赛: 凌晨1点" data-en="Start: 1 AM">开赛: 凌晨1点</span>
+                        <span class="stat" data-zh="情感: 不舍" data-en="Emotion: Reluctant">情感: 不舍</span>
                     </div>
-                    <p><strong>最后一战：</strong>Tomomi翻盘夺冠、tough guy三个家人陪跑、Jackie 12岁女儿半马2:20</p>
-                    <p><strong>离别不舍：</strong>赵西安折返跑、yuki最后1km的理智、系统排名最后的不公</p>
-                </div>
-                
-                <div class="chapter-card">
-                    <h3>💭 写在结束以后 - 人生感悟</h3>
-                    <div class="chapter-stats">
-                        <span class="stat">社交: 社恐→社牛</span>
-                        <span class="stat">理念: Journey is reward</span>
-                        <span class="stat">收获: 无限</span>
-                    </div>
-                    <p><strong>意外发现：</strong>甄17说我是"社牛"、67岁音乐家Lisa的人生课、乌拉圭司机的一致观点</p>
-                    <p><strong>深刻理解：</strong>没有积累没有奇迹、过程才是真正目的、天然基因吻合的朋友</p>
+                    <p><strong data-zh="最后一战：" data-en="Final Battle:">最后一战：</strong><span data-zh="Tomomi翻盘夺冠、tough guy三个家人陪跑、Jackie 12岁女儿半马2:20" data-en="Tomomi's comeback victory, tough guy with three family members pacing, Jackie's 12-year-old daughter ran half marathon in 2:20">Tomomi翻盘夺冠、tough guy三个家人陪跑、Jackie 12岁女儿半马2:20</span></p>
+                    <p><strong data-zh="离别不舍：" data-en="Reluctant Farewell:">离别不舍：</strong><span data-zh="赵西安折返跑、yuki最后1km的理智、系统排名最后的不公" data-en="Zhao Xi'an's back-and-forth running, Yuki's rationality in final 1km, unfair final system ranking">赵西安折返跑、yuki最后1km的理智、系统排名最后的不公</span></p>
                 </div>
             </div>
         </section>
 
         <section id="gallery">
-            <h2>图片展示</h2>
+            <h2 data-zh="📸 图片展示" data-en="📸 Photo Gallery">📸 图片展示</h2>
             
             <!-- 图片轮播 -->
             <div class="carousel-container">
@@ -1134,71 +1350,71 @@
                         <div class="carousel-slide active">
                             <img src="https://pfst.cf2.poecdn.net/base/image/e3e5107b31cb65e666b001427a139b98b43bd44c6a24f32a21cd29964385f526?w=1666&h=2500" alt="Henry在非洲开普敦马拉松 - 16号参赛者奔跑中">
                             <div class="carousel-caption">
-                                <h3>开普敦马拉松</h3>
-                                <p>Henry（16号）在非洲酷热赛道上的奔跑英姿</p>
+                                <h3 data-zh="开普敦马拉松" data-en="Cape Town Marathon">开普敦马拉松</h3>
+                                <p data-zh="Henry（16号）在非洲酷热赛道上的奔跑英姿" data-en="Henry (#16) running on the hot African course">Henry（16号）在非洲酷热赛道上的奔跑英姿</p>
                             </div>
                         </div>
                         <div class="carousel-slide">
                             <img src="https://pfst.cf2.poecdn.net/base/image/8a9ff44a9c097f4bf9bd12fd21caf6d615fd129decb46603b4fe07d37576015c?w=2500&h=1667" alt="开普敦华人团队大合影 - 桌山背景下的中国跑友们">
                             <div class="carousel-caption">
-                                <h3>桌山下的聚会</h3>
-                                <p>开普敦华人跑友团队大合影，五星红旗飘扬</p>
+                                <h3 data-zh="桌山下的聚会" data-en="Gathering Under Table Mountain">桌山下的聚会</h3>
+                                <p data-zh="开普敦华人跑友团队大合影，五星红旗飘扬" data-en="Chinese runners team photo in Cape Town with the flag flying">开普敦华人跑友团队大合影，五星红旗飘扬</p>
                             </div>
                         </div>
                         <div class="carousel-slide">
                             <img src="https://pfst.cf2.poecdn.net/base/image/90bc4be8633ab0b641eff998609747c01c8f1e952e0a741647756ab158df8144?w=2000&h=2500" alt="Henry（16号）与甄17一起跑步 - 并肩作战">
                             <div class="carousel-caption">
-                                <h3>并肩作战</h3>
-                                <p>Henry（16号）与甄17的友谊见证</p>
+                                <h3 data-zh="并肩作战" data-en="Side by Side">并肩作战</h3>
+                                <p data-zh="Henry（16号）与甄17的友谊见证" data-en="Witness to the friendship between Henry (#16) and Zhen 17">Henry（16号）与甄17的友谊见证</p>
                             </div>
                         </div>
                         <div class="carousel-slide">
                             <img src="https://pfst.cf2.poecdn.net/base/image/c936caf147008eb69dd7914970a563b0a609c2e8e8f27ec8b1c967aa3cf45942?w=2000&h=2500" alt="三人小火车 - Henry和队友们的团队跑步">
                             <div class="carousel-caption">
-                                <h3>三人小火车</h3>
-                                <p>Henry与队友们的默契配合</p>
+                                <h3 data-zh="三人小火车" data-en="Three-Person Train">三人小火车</h3>
+                                <p data-zh="Henry与队友们的默契配合" data-en="Henry's perfect coordination with teammates">Henry与队友们的默契配合</p>
                             </div>
                         </div>
                         <div class="carousel-slide">
                             <img src="https://pfst.cf2.poecdn.net/base/image/cee7aca3dcca20c8420a483f0cfaf583111e0a5190fcae66e4b3c3512925b0f3?w=2480&h=1653" alt="WMC 777完赛 - 三人组戴着完赛奖牌的胜利时刻">
                             <div class="carousel-caption">
-                                <h3>胜利时刻</h3>
-                                <p>WMC 777完赛，三人组戴着奖牌的荣耀</p>
+                                <h3 data-zh="胜利时刻" data-en="Victory Moment">胜利时刻</h3>
+                                <p data-zh="WMC 777完赛，三人组戴着奖牌的荣耀" data-en="WMC 777 finish, the trio's glory with their medals">WMC 777完赛，三人组戴着奖牌的荣耀</p>
                             </div>
                         </div>
                         <div class="carousel-slide">
                             <img src="https://pfst.cf2.poecdn.net/base/image/2d0192b1b5d46ab3dddc64c04e1fc21b5e1dab42f4e41a317f960aaee0473088?w=1667&h=2500" alt="迪拜EXPO City冲线 - Henry（25号）与跑友的阿拉伯风情冲线">
                             <div class="carousel-caption">
-                                <h3>迪拜EXPO冲线</h3>
-                                <p>Henry（25号）在阿拉伯风情背景下的冲线瞬间</p>
+                                <h3 data-zh="迪拜EXPO冲线" data-en="Dubai EXPO Finish">迪拜EXPO冲线</h3>
+                                <p data-zh="Henry（25号）在阿拉伯风情背景下的冲线瞬间" data-en="Henry (#25) finishing against the Arabian backdrop">Henry（25号）在阿拉伯风情背景下的冲线瞬间</p>
                             </div>
                         </div>
                         <div class="carousel-slide">
                             <img src="https://pfst.cf2.poecdn.net/base/image/2b2734ac0029365fbc4e6580895c649c25aeb206c4d777edde38244d1b06c42d?w=4032&h=3024" alt="城市天际线自拍 - Henry与跑友的友谊见证">
                             <div class="carousel-caption">
-                                <h3>城市天际线</h3>
-                                <p>Henry与跑友在都市背景下的友谊自拍</p>
+                                <h3 data-zh="城市天际线" data-en="City Skyline">城市天际线</h3>
+                                <p data-zh="Henry与跑友在都市背景下的友谊自拍" data-en="Henry and running friends' friendship selfie against urban backdrop">Henry与跑友在都市背景下的友谊自拍</p>
                             </div>
                         </div>
                         <div class="carousel-slide">
                             <img src="https://pfst.cf2.poecdn.net/base/image/2d93a267894a887aa122c78765599f9540aa0001eb4b699768d58a41f628ecbd?w=2480&h=1653" alt="赛后拉伸 - 蓝衣女跑友的一字马展示">
                             <div class="carousel-caption">
-                                <h3>赛后拉伸</h3>
-                                <p>跑友展示专业的拉伸动作和运动精神</p>
+                                <h3 data-zh="赛后拉伸" data-en="Post-Race Stretching">赛后拉伸</h3>
+                                <p data-zh="跑友展示专业的拉伸动作和运动精神" data-en="Runner demonstrating professional stretching and sportsmanship">跑友展示专业的拉伸动作和运动精神</p>
                             </div>
                         </div>
                         <div class="carousel-slide">
                             <img src="https://pfst.cf2.poecdn.net/base/image/d023e0eda51626477a911900a516c2e3a1c3ef3641aac0cbca268999cf26b59c?w=2480&h=1653" alt="夜跑时光 - Henry（16号）在夜色中的坚持">
                             <div class="carousel-caption">
-                                <h3>夜跑时光</h3>
-                                <p>Henry（16号）在澳洲夜色中的坚持身影</p>
+                                <h3 data-zh="夜跑时光" data-en="Night Running">夜跑时光</h3>
+                                <p data-zh="Henry（16号）在澳洲夜色中的坚持身影" data-en="Henry (#16) persisting in the Australian night">Henry（16号）在澳洲夜色中的坚持身影</p>
                             </div>
                         </div>
                         <div class="carousel-slide">
                             <img src="https://pfst.cf2.poecdn.net/base/image/1593b372c53ba287202dbe113970ca27e716a9120a13b79427483dad7c6ab5f8?w=2480&h=1653" alt="赛道补给 - 队友间的相互照顾与支持">
                             <div class="carousel-caption">
-                                <h3>赛道补给</h3>
-                                <p>队友间相互照顾与支持的温馨瞬间</p>
+                                <h3 data-zh="赛道补给" data-en="Course Support">赛道补给</h3>
+                                <p data-zh="队友间相互照顾与支持的温馨瞬间" data-en="Heartwarming moments of mutual care and support among teammates">队友间相互照顾与支持的温馨瞬间</p>
                             </div>
                         </div>
                     </div>
@@ -1222,44 +1438,151 @@
                     <button class="carousel-indicator" data-slide="9"></button>
                 </div>
             </div>
+        </section>
 
-            <!-- 原有的网格布局作为备选 -->
-            <div class="gallery-grid" style="margin-top: 3rem;">
-                <h3 style="margin-bottom: 1.5rem; color: var(--gray-600);">所有照片</h3>
-                <div class="gallery">
-                    <img src="https://pfst.cf2.poecdn.net/base/image/e3e5107b31cb65e666b001427a139b98b43bd44c6a24f32a21cd29964385f526?w=1666&h=2500" alt="Henry在非洲开普敦马拉松 - 16号参赛者奔跑中">
-                    <img src="https://pfst.cf2.poecdn.net/base/image/8a9ff44a9c097f4bf9bd12fd21caf6d615fd129decb46603b4fe07d37576015c?w=2500&h=1667" alt="开普敦华人团队大合影 - 桌山背景下的中国跑友们">
-                    <img src="https://pfst.cf2.poecdn.net/base/image/90bc4be8633ab0b641eff998609747c01c8f1e952e0a741647756ab158df8144?w=2000&h=2500" alt="Henry（16号）与甄17一起跑步 - 并肩作战">
-                    <img src="https://pfst.cf2.poecdn.net/base/image/c936caf147008eb69dd7914970a563b0a609c2e8e8f27ec8b1c967aa3cf45942?w=2000&h=2500" alt="三人小火车 - Henry和队友们的团队跑步">
-                    <img src="https://pfst.cf2.poecdn.net/base/image/cee7aca3dcca20c8420a483f0cfaf583111e0a5190fcae66e4b3c3512925b0f3?w=2480&h=1653" alt="WMC 777完赛 - 三人组戴着完赛奖牌的胜利时刻">
-                    <img src="https://pfst.cf2.poecdn.net/base/image/2d0192b1b5d46ab3dddc64c04e1fc21b5e1dab42f4e41a317f960aaee0473088?w=1667&h=2500" alt="迪拜EXPO City冲线 - Henry（25号）与跑友的阿拉伯风情冲线">
-                    <img src="https://pfst.cf2.poecdn.net/base/image/2b2734ac0029365fbc4e6580895c649c25aeb206c4d777edde38244d1b06c42d?w=4032&h=3024" alt="城市天际线自拍 - Henry与跑友的友谊见证">
-                    <img src="https://pfst.cf2.poecdn.net/base/image/2d93a267894a887aa122c78765599f9540aa0001eb4b699768d58a41f628ecbd?w=2480&h=1653" alt="赛后拉伸 - 蓝衣女跑友的一字马展示">
-                    <img src="https://pfst.cf2.poecdn.net/base/image/d023e0eda51626477a911900a516c2e3a1c3ef3641aac0cbca268999cf26b59c?w=2480&h=1653" alt="夜跑时光 - Henry（16号）在夜色中的坚持">
-                    <img src="https://pfst.cf2.poecdn.net/base/image/1593b372c53ba287202dbe113970ca27e716a9120a13b79427483dad7c6ab5f8?w=2480&h=1653" alt="赛道补给 - 队友间的相互照顾与支持">
+        <section id="insights">
+            <h2 data-zh="💭 人生感悟" data-en="💭 Life Insights">💭 人生感悟</h2>
+            
+            <div style="background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%); color: var(--white); padding: 2rem; border-radius: 16px; margin: 2rem 0;">
+                <h3 style="color: var(--white); margin-bottom: 1rem;" data-zh="🌟 寻找未知的自己" data-en="🌟 Finding the Unknown Self">🌟 寻找未知的自己</h3>
+                <p style="color: rgba(255, 255, 255, 0.9); margin: 0;" data-zh="这次征程不仅是体能的挑战，更是心灵的探索。从"社恐"到"社牛"的转变，从AI思维到人类情感的回归，每一步都是成长的足迹。" data-en="This journey is not only a physical challenge but also a spiritual exploration. The transformation from 'social anxiety' to 'social confidence', from AI thinking to human emotion, every step is a footprint of growth.">这次征程不仅是体能的挑战，更是心灵的探索。从"社恐"到"社牛"的转变，从AI思维到人类情感的回归，每一步都是成长的足迹。</p>
+            </div>
+            
+            <h3 data-zh="🔍 我来寻找什么？" data-en="🔍 What Was I Looking For?">🔍 我来寻找什么？</h3>
+            <blockquote>
+                <p data-zh="我来寻找一些我不知道我不知道的。上次我去台湾的跳岛777，我被很多的跑者的热情感动，然后就特别热爱自己的工作了，因为我突然醒悟到，我对工作是最有热情的，因为我工作的这个细分领域，我是很有机会做成世界第一的，既然这样，为何不痛并快乐的追逐这个梦想呢" data-en="I came to find something I didn't know I didn't know. Last time I went to Taiwan's island-hopping 777, I was moved by many runners' enthusiasm, and then I particularly loved my work, because I suddenly realized that I was most passionate about my work, because in this subdivision of my work, I have a great chance to become world number one, and if so, why not pursue this dream with pain and joy">我来寻找一些我不知道我不知道的。上次我去台湾的跳岛777，我被很多的跑者的热情感动，然后就特别热爱自己的工作了，因为我突然醒悟到，我对工作是最有热情的，因为我工作的这个细分领域，我是很有机会做成世界第一的，既然这样，为何不痛并快乐的追逐这个梦想呢</p>
+            </blockquote>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin: 2rem 0;">
+                <div style="background: var(--white); padding: 2rem; border-radius: 12px; border-left: 4px solid var(--success); box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
+                    <h4 style="color: var(--success); margin-bottom: 1rem;" data-zh="🤝 社交的觉醒" data-en="🤝 Social Awakening">🤝 社交的觉醒</h4>
+                    <p data-zh="甄17说我是'社牛'。这辈子我第一次听有人这么说我。因为这次的人都很积极有趣并且有着共同的爱好，所以我碰到任何人都觉得天然基因吻合，然后就愿意主动沟通了。" data-en="Zhen 17 said I was 'socially confident'. This was the first time in my life someone said this about me. Because everyone this time was positive, interesting, and had common hobbies, I felt naturally compatible with anyone I met and was willing to communicate actively.">甄17说我是"社牛"。这辈子我第一次听有人这么说我。因为这次的人都很积极有趣并且有着共同的爱好，所以我碰到任何人都觉得天然基因吻合，然后就愿意主动沟通了。</p>
                 </div>
+                
+                <div style="background: var(--white); padding: 2rem; border-radius: 12px; border-left: 4px solid var(--gold); box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
+                    <h4 style="color: var(--gold); margin-bottom: 1rem;" data-zh="🎯 过程的价值" data-en="🎯 Value of Process">🎯 过程的价值</h4>
+                    <p data-zh="Journey is the reward。这次更加加深。跑步没有奇迹，只有累积。过程才是真正的目的，要多享受过程。世界上任何事情没有捷径，就是累积，到了一定的度，才会质变。" data-en="Journey is the reward. This was deepened even more this time. There are no miracles in running, only accumulation. Process is the real purpose, enjoy the process more. There are no shortcuts to anything in the world, just accumulation, and only after reaching a certain degree will there be qualitative change.">Journey is the reward。这次更加加深。跑步没有奇迹，只有累积。过程才是真正的目的，要多享受过程。世界上任何事情没有捷径，就是累积，到了一定的度，才会质变。</p>
+                </div>
+                
+                <div style="background: var(--white); padding: 2rem; border-radius: 12px; border-left: 4px solid var(--primary-blue); box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
+                    <h4 style="color: var(--primary-blue); margin-bottom: 1rem;" data-zh="❤️ 认真对话的力量" data-en="❤️ Power of Serious Conversation">❤️ 认真对话的力量</h4>
+                    <p data-zh="我比较喜欢2-3人的聚会，可以认真谈个话题。这次和卞大哥、洛杉矶陈和Charles都认真聊了会，就觉得更加了解他们了。未来我希望更加直接，少些纯粹social和small talk的沟通。" data-en="I prefer 2-3 person gatherings where we can seriously discuss topics. This time I had serious conversations with Brother Bian, LA Chen, and Charles, and felt I understood them better. In the future, I hope to be more direct, with less pure social and small talk communication.">我比较喜欢2-3人的聚会，可以认真谈个话题。这次和卞大哥、洛杉矶陈和Charles都认真聊了会，就觉得更加了解他们了。未来我希望更加直接，少些纯粹social和small talk的沟通。</p>
+                </div>
+            </div>
+            
+            <h3 data-zh="🌍 与乌拉圭司机的共鸣" data-en="🌍 Resonance with Uruguayan Driver">🌍 与乌拉圭司机的共鸣</h3>
+            <p data-zh="从迈阿密去机场的时候，司机是乌拉圭人，我们特高兴的谈了快40分钟。他介绍了好多乌拉圭，我给他介绍华人社会，同时，我们对美国的很多事情的看法，竟然都出奇的一致。" data-en="When going from Miami to the airport, the driver was Uruguayan, and we happily talked for almost 40 minutes. He introduced a lot about Uruguay, I introduced Chinese society to him, and at the same time, our views on many American things were surprisingly consistent.">从迈阿密去机场的时候，司机是乌拉圭人，我们特高兴的谈了快40分钟。他介绍了好多乌拉圭，我给他介绍华人社会，同时，我们对美国的很多事情的看法，竟然都出奇的一致。</p>
+            
+            <div style="background: rgba(16, 185, 129, 0.1); padding: 2rem; border-radius: 16px; border: 1px solid rgba(16, 185, 129, 0.2); margin: 2rem 0; text-align: center;">
+                <h4 style="color: var(--success); margin-bottom: 1rem;" data-zh="💡 最终领悟" data-en="💡 Final Realization">💡 最终领悟</h4>
+                <p style="margin: 0; font-size: 1.2rem; font-style: italic;">
+                    <strong data-zh="我会用更积极的态度去生活。也祝福所有这次认识的新朋友们，都乐观积极的去生活，江湖再见~~" data-en="I will live with a more positive attitude. I also wish all the new friends I met this time to live optimistically and positively. See you again in the world~~">我会用更积极的态度去生活。也祝福所有这次认识的新朋友们，都乐观积极的去生活，江湖再见~~</strong>
+                </p>
             </div>
         </section>
 
-        <section id="conclusion">
-            <h2>结束语</h2>
-            <p>Henry 的 WMC 777 马拉松旅程，不仅是一次运动的挑战，更是一场心灵的探索。他用这段经历重新审视了人生的意义，并结交了许多志同道合的朋友。愿每个人都能从他的故事中获得启发，勇敢追逐自己的梦想。</p>
+        <section id="comments">
+            <h2 data-zh="💬 留言板" data-en="💬 Comments">💬 留言板</h2>
             
-            <div style="background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%); color: var(--white); padding: 2rem; border-radius: 16px; margin: 2rem 0; text-align: center;">
-                <h3 style="color: var(--white); margin-bottom: 1rem;">🎉 感谢关注Henry的马拉松征程</h3>
-                <p style="color: rgba(255, 255, 255, 0.9); margin: 0; font-size: 1.1rem;">
-                    这不仅是一次跑步，更是一次人生的重新定义。<br>
-                    <strong>Journey is the reward - 过程就是奖励</strong>
-                </p>
+            <div style="background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%); color: var(--white); padding: 2rem; border-radius: 16px; margin: 2rem 0;">
+                <h3 style="color: var(--white); margin-bottom: 1rem;" data-zh="🌟 分享你的跑步故事" data-en="🌟 Share Your Running Story">🌟 分享你的跑步故事</h3>
+                <p style="color: rgba(255, 255, 255, 0.9); margin: 0;" data-zh="Henry的WMC 777之旅激励了你吗？分享你的跑步经历、挑战心得，或者对Henry说几句鼓励的话！" data-en="Was Henry's WMC 777 journey inspiring? Share your running experiences, challenge insights, or leave some encouraging words for Henry!">Henry的WMC 777之旅激励了你吗？分享你的跑步经历、挑战心得，或者对Henry说几句鼓励的话！</p>
+            </div>
+            
+            <div class="comments-section">
+                <div class="comment-form">
+                    <h4 style="color: var(--primary-blue); margin-bottom: 1rem;" data-zh="📝 留下你的感想" data-en="📝 Leave Your Thoughts">📝 留下你的感想</h4>
+                    <input type="text" id="commentName" placeholder="你的姓名 / Your Name" data-placeholder-zh="你的姓名" data-placeholder-en="Your Name">
+                    <input type="email" id="commentEmail" placeholder="邮箱（可选）/ Email (Optional)" data-placeholder-zh="邮箱（可选）" data-placeholder-en="Email (Optional)">
+                    <textarea id="commentText" rows="4" placeholder="分享你的跑步故事或对Henry的鼓励... / Share your running story or encouragement for Henry..." data-placeholder-zh="分享你的跑步故事或对Henry的鼓励..." data-placeholder-en="Share your running story or encouragement for Henry..."></textarea>
+                    <button onclick="submitComment()" data-zh="🚀 发布留言" data-en="🚀 Post Comment">🚀 发布留言</button>
+                </div>
+                
+                <div id="comments-list">
+                    <h4 style="color: var(--primary-blue); margin-bottom: 1rem;" data-zh="💌 读者留言" data-en="💌 Reader Comments">💌 读者留言</h4>
+                    
+                    <!-- 示例留言 -->
+                    <div class="comment-item">
+                        <div class="comment-author">张伟 Zhang Wei</div>
+                        <div class="comment-date">2025年1月15日 | Jan 15, 2025</div>
+                        <div class="comment-text" data-zh="Henry的故事太励志了！我也是跑步爱好者，看到他从南极的6小时到澳洲的突破，真的很感动。特别是"三人小火车"的友谊，这就是跑步的魅力啊！我今年也要挑战我的第一个全马。" data-en="Henry's story is so inspiring! I'm also a running enthusiast, and seeing his breakthrough from 6 hours in Antarctica to his achievement in Australia is really moving. Especially the friendship of the 'three-person train' - this is the charm of running! I'm going to challenge my first full marathon this year too.">Henry的故事太励志了！我也是跑步爱好者，看到他从南极的6小时到澳洲的突破，真的很感动。特别是"三人小火车"的友谊，这就是跑步的魅力啊！我今年也要挑战我的第一个全马。</div>
+                    </div>
+                    
+                    <div class="comment-item">
+                        <div class="comment-author">Lisa Chen</div>
+                        <div class="comment-date">2025年1月12日 | Jan 12, 2025</div>
+                        <div class="comment-text" data-zh="作为一个女跑者，我特别佩服Henry在这么极端的条件下坚持下来。WMC 777真的是人类极限的挑战。我最喜欢他说的"Journey is the reward"，这句话我要贴在我的跑步日记里！" data-en="As a female runner, I especially admire Henry's persistence under such extreme conditions. WMC 777 is truly a challenge to human limits. I love his saying 'Journey is the reward' - I'm going to stick this in my running diary!">作为一个女跑者，我特别佩服Henry在这么极端的条件下坚持下来。WMC 777真的是人类极限的挑战。我最喜欢他说的"Journey is the reward"，这句话我要贴在我的跑步日记里！</div>
+                    </div>
+                    
+                    <div class="comment-item">
+                        <div class="comment-author">Michael Rodriguez</div>
+                        <div class="comment-date">2025年1月10日 | Jan 10, 2025</div>
+                        <div class="comment-text" data-zh="Incredible journey! I've been following WMC 777 for years but never had the courage to sign up. Henry's detailed sharing gives me a real insight into what it takes. The friendship with Zhao Xi'an and Yuki sounds amazing. Maybe 2026 will be my year to try!" data-en="Incredible journey! I've been following WMC 777 for years but never had the courage to sign up. Henry's detailed sharing gives me a real insight into what it takes. The friendship with Zhao Xi'an and Yuki sounds amazing. Maybe 2026 will be my year to try!">Incredible journey! I've been following WMC 777 for years but never had the courage to sign up. Henry's detailed sharing gives me a real insight into what it takes. The friendship with Zhao Xi'an and Yuki sounds amazing. Maybe 2026 will be my year to try!</div>
+                    </div>
+                    
+                    <div class="comment-item">
+                        <div class="comment-author">王小明</div>
+                        <div class="comment-date">2025年1月8日 | Jan 8, 2025</div>
+                        <div class="comment-text">Charles的按摩技术也太神奇了吧！从"扶楼梯"到"腿部正常"，这简直是奇迹！我也想找Charles按摩一次🤣 不过说真的，这种友谊和互相帮助真的很感人。</div>
+                    </div>
+                </div>
             </div>
         </section>
     </div>
 
+    <!-- 章节详情模态窗口 -->
+    <div id="chapterModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeChapterModal()">&times;</span>
+            <div id="modalContent">
+                <!-- 动态内容将在这里显示 -->
+            </div>
+        </div>
+    </div>
+
     <footer>
-        <p>© 2025 Henry 的 WMC 777. 保留所有权利。</p>
+        <p data-zh="© 2025 Henry 的 WMC 777. 保留所有权利。" data-en="© 2025 Henry's WMC 777. All rights reserved.">© 2025 Henry 的 WMC 777. 保留所有权利。</p>
     </footer>
 
     <script>
+        // 当前语言状态
+        let currentLanguage = 'zh';
+        
+        // 语言切换功能
+        function switchLanguage(lang) {
+            currentLanguage = lang;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.language-switcher button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`lang-${lang}`).classList.add('active');
+            
+            // 更新所有带有语言属性的元素
+            document.querySelectorAll('[data-zh][data-en]').forEach(element => {
+                const text = element.getAttribute(`data-${lang}`);
+                if (text) {
+                    element.textContent = text;
+                }
+            });
+            
+            // 更新表单占位符
+            document.querySelectorAll('[data-placeholder-zh][data-placeholder-en]').forEach(element => {
+                const placeholder = element.getAttribute(`data-placeholder-${lang}`);
+                if (placeholder) {
+                    element.placeholder = placeholder;
+                }
+            });
+            
+            // 更新文档语言属性
+            document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+            
+            // 重新初始化图表（如果需要多语言标签）
+            if (window.performanceChart) {
+                updateChart();
+            }
+        }
+
         // 深色模式自动检测
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.body.classList.add('dark');
@@ -1288,79 +1611,79 @@
                 // 马拉松站点数据
                 const raceStations = [
                     {
-                        name: '南极洲',
-                        location: '联合冰川营地',
+                        name: { zh: '南极洲', en: 'Antarctica' },
+                        location: { zh: '联合冰川营地', en: 'Union Glacier Camp' },
                         coordinates: [-79.7667, -82.8667],
                         day: 1,
                         color: '#00d4ff',
                         emoji: '🏔️',
-                        details: '海拔457米，气温-20°C到-30°C',
+                        details: { zh: '海拔457米，气温-20°C到-30°C', en: 'Altitude 457m, -20°C to -30°C' },
                         rank: '41',
-                        time: '~6小时'
+                        time: { zh: '~6小时', en: '~6 hours' }
                     },
                     {
-                        name: '非洲',
-                        location: '南非开普敦',
+                        name: { zh: '非洲', en: 'Africa' },
+                        location: { zh: '南非开普敦', en: 'Cape Town, South Africa' },
                         coordinates: [-33.9249, 18.4241],
                         day: 2,
                         color: '#ff6b35',
                         emoji: '🌍',
-                        details: '桌山脚下，地中海气候',
+                        details: { zh: '桌山脚下，地中海气候', en: 'Foot of Table Mountain, Mediterranean climate' },
                         rank: '25',
                         time: '5:17'
                     },
                     {
-                        name: '大洋洲',
-                        location: '澳大利亚珀斯',
+                        name: { zh: '大洋洲', en: 'Oceania' },
+                        location: { zh: '澳大利亚珀斯', en: 'Perth, Australia' },
                         coordinates: [-31.9505, 115.8605],
                         day: 3,
                         color: '#4ecdc4',
                         emoji: '🇦🇺',
-                        details: '夜跑，沿天鹅河畔',
+                        details: { zh: '夜跑，沿天鹅河畔', en: 'Night run along Swan River' },
                         rank: '18',
                         time: '<5:00'
                     },
                     {
-                        name: '亚洲',
-                        location: '阿联酋迪拜',
+                        name: { zh: '亚洲', en: 'Asia' },
+                        location: { zh: '阿联酋迪拜', en: 'Dubai, UAE' },
                         coordinates: [25.2048, 55.2708],
                         day: 4,
                         color: '#ffa726',
                         emoji: '🏜️',
-                        details: 'EXPO 2020展馆，沙漠气候',
+                        details: { zh: 'EXPO 2020展馆，沙漠气候', en: 'EXPO 2020 venue, desert climate' },
                         rank: '34',
                         time: '5:26'
                     },
                     {
-                        name: '欧洲',
-                        location: '西班牙马德里',
+                        name: { zh: '欧洲', en: 'Europe' },
+                        location: { zh: '西班牙马德里', en: 'Madrid, Spain' },
                         coordinates: [40.4168, -3.7038],
                         day: 5,
                         color: '#ba68c8',
                         emoji: '🏁',
-                        details: 'F1赛道，海拔爬升500米',
+                        details: { zh: 'F1赛道，海拔爬升500米', en: 'F1 circuit, 500m elevation gain' },
                         rank: '27',
                         time: '<5:00'
                     },
                     {
-                        name: '南美洲',
-                        location: '巴西福塔雷萨',
+                        name: { zh: '南美洲', en: 'South America' },
+                        location: { zh: '巴西福塔雷萨', en: 'Fortaleza, Brazil' },
                         coordinates: [-3.7319, -38.5267],
                         day: 6,
                         color: '#66bb6a',
                         emoji: '🌴',
-                        details: '热带海滨城市，高温高湿',
+                        details: { zh: '热带海滨城市，高温高湿', en: 'Tropical coastal city, hot and humid' },
                         rank: '23',
                         time: '5:37'
                     },
                     {
-                        name: '北美洲',
-                        location: '美国迈阿密',
+                        name: { zh: '北美洲', en: 'North America' },
+                        location: { zh: '美国迈阿密', en: 'Miami, USA' },
                         coordinates: [25.7617, -80.1918],
                         day: 7,
                         color: '#ef5350',
                         emoji: '🏖️',
-                        details: '凌晨1点开始，海滨夜跑',
+                        details: { zh: '凌晨1点开始，海滨夜跑', en: '1 AM start, beachside night run' },
                         rank: '25',
                         time: '<5:00'
                     }
@@ -1380,22 +1703,32 @@
                     const marker = L.marker(station.coordinates, {icon: customIcon}).addTo(map);
 
                     // 添加弹出窗口
-                    marker.bindPopup(`
-                        <div style="text-align: center; padding: 0.5rem; min-width: 200px;">
-                            <h3 style="color: ${station.color}; margin: 0 0 0.5rem 0; font-size: 1rem;">
-                                ${station.emoji} 第${station.day}站：${station.name}
-                            </h3>
-                            <p style="margin: 0 0 0.5rem 0; font-weight: 600; color: #333; font-size: 0.9rem;">
-                                ${station.location}
-                            </p>
-                            <p style="margin: 0 0 0.5rem 0; color: #666; font-size: 0.8rem;">
-                                ${station.details}
-                            </p>
-                            <div style="background: ${station.color}; color: white; padding: 0.3rem 0.5rem; border-radius: 6px; font-size: 0.8rem; font-weight: bold;">
-                                排名: ${station.rank} | 时间: ${station.time}
+                    marker.bindPopup(() => {
+                        const lang = currentLanguage;
+                        const name = station.name[lang] || station.name.zh;
+                        const location = station.location[lang] || station.location.zh;
+                        const details = station.details[lang] || station.details.zh;
+                        const time = station.time[lang] || station.time;
+                        const rankText = lang === 'zh' ? '排名' : 'Rank';
+                        const timeText = lang === 'zh' ? '时间' : 'Time';
+                        
+                        return `
+                            <div style="text-align: center; padding: 0.5rem; min-width: 200px;">
+                                <h3 style="color: ${station.color}; margin: 0 0 0.5rem 0; font-size: 1rem;">
+                                    ${station.emoji} ${lang === 'zh' ? '第' : 'Stop '}${station.day}${lang === 'zh' ? '站：' : ': '}${name}
+                                </h3>
+                                <p style="margin: 0 0 0.5rem 0; font-weight: 600; color: #333; font-size: 0.9rem;">
+                                    ${location}
+                                </p>
+                                <p style="margin: 0 0 0.5rem 0; color: #666; font-size: 0.8rem;">
+                                    ${details}
+                                </p>
+                                <div style="background: ${station.color}; color: white; padding: 0.3rem 0.5rem; border-radius: 6px; font-size: 0.8rem; font-weight: bold;">
+                                    ${rankText}: ${station.rank} | ${timeText}: ${time}
+                                </div>
                             </div>
-                        </div>
-                    `, {
+                        `;
+                    }, {
                         maxWidth: 250,
                         className: 'race-popup'
                     });
@@ -1424,10 +1757,622 @@
                 document.getElementById('race-map').innerHTML = `
                     <div style="display: flex; justify-content: center; align-items: center; height: 100%; background: #f3f4f6; border-radius: 12px; flex-direction: column;">
                         <div style="font-size: 3rem; margin-bottom: 1rem;">🗺️</div>
-                        <div style="font-size: 1.1rem; color: #6b7280;">地图加载中...</div>
-                        <div style="font-size: 0.9rem; color: #9ca3af; margin-top: 0.5rem;">请稍候片刻</div>
+                        <div style="font-size: 1.1rem; color: #6b7280;">${currentLanguage === 'zh' ? '地图加载中...' : 'Loading map...'}</div>
+                        <div style="font-size: 0.9rem; color: #9ca3af; margin-top: 0.5rem;">${currentLanguage === 'zh' ? '请稍候片刻' : 'Please wait a moment'}</div>
                     </div>
                 `;
+            }
+        }
+
+        // 成绩图表初始化
+        function initPerformanceChart() {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            
+            const raceData = {
+                labels: currentLanguage === 'zh' ? 
+                    ['南极洲', '非洲', '大洋洲', '亚洲', '欧洲', '南美洲', '北美洲'] :
+                    ['Antarctica', 'Africa', 'Oceania', 'Asia', 'Europe', 'S.America', 'N.America'],
+                datasets: [{
+                    label: currentLanguage === 'zh' ? '完赛时间（分钟）' : 'Finish Time (Minutes)',
+                    data: [360, 317, 300, 326, 300, 337, 300], // 转换为分钟
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: ['#00d4ff', '#ff6b35', '#4ecdc4', '#ffa726', '#ba68c8', '#66bb6a', '#ef5350'],
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 3,
+                    pointRadius: 8,
+                    pointHoverRadius: 12
+                }]
+            };
+
+            window.performanceChart = new Chart(ctx, {
+                type: 'line',
+                data: raceData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const minutes = context.parsed.y;
+                                    const hours = Math.floor(minutes / 60);
+                                    const mins = minutes % 60;
+                                    const timeStr = hours > 0 ? `${hours}:${mins.toString().padStart(2, '0')}` : `${mins}分钟`;
+                                    return currentLanguage === 'zh' ? 
+                                        `完赛时间: ${timeStr}` : 
+                                        `Finish Time: ${timeStr}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 280,
+                            max: 380,
+                            title: {
+                                display: true,
+                                text: currentLanguage === 'zh' ? '时间（分钟）' : 'Time (Minutes)',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    const hours = Math.floor(value / 60);
+                                    const minutes = value % 60;
+                                    return hours > 0 ? `${hours}:${minutes.toString().padStart(2, '0')}` : `${minutes}分`;
+                                }
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: currentLanguage === 'zh' ? '比赛站点' : 'Race Stops',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+        }
+
+        // 更新图表语言
+        function updateChart() {
+            if (window.performanceChart) {
+                window.performanceChart.destroy();
+                initPerformanceChart();
+            }
+        }
+
+        // 章节详情数据
+        const chapterDetails = {
+            antarctica: {
+                zh: {
+                    title: '🏔️ 南极洲马拉松 - 初见',
+                    content: `
+                        <h3>第一站：南极洲 | 排名：41 | 时间：约6小时</h3>
+                        
+                        <h4>🌅 清晨的开始</h4>
+                        <p>1月31日的4点20起床5点大厅集合，charles还提供了叫醒服务。然后大巴去机场，过关等，然后见到了我们的货机。因为第一次坐货机，就忘掉了飞机的各种破破烂烂，只剩下探险的感觉。</p>
+                        
+                        <h4>❄️ 南极的挑战</h4>
+                        <p>我脱掉了冲锋衣和冲锋裤，觉得没有必要，然后正式比赛了。南极是10圈，很快就被套圈了。我的鞋子很好，一个跑过wmc777的朋友（波哥）送我的，鞋底还有一点点钢钉呢，所以抓地就很牢固。很多人都摔跤了，我没有。</p>
+                        
+                        <h4>🤝 与Magen的携手冲线</h4>
+                        <p>最后一个lap，我们聊天，我们都是一月份生日刚过，她相信今年是我们的lucky年。最后时刻，她想走，我说no。最后300米了，一起携手冲线吧！过了终点，我回头一看，她在垃圾桶呕吐，我觉得我貌似做错了什么。</p>
+                        
+                        <h4>🌪️ 南极的严寒考验</h4>
+                        <p>南极的后半程我真想走，也走了几分钟。结果冻僵了，不得不跑。这个时候我觉得我不穿冲锋衣是个坏主意，因为起风了，嗖嗖的透过衣服。好消息就是不得不坚持跑，最后一个lap胜利在望。我就努力的看周围的风景，看夕阳（虽然它永不会落）记住这里是南极。</p>
+                        
+                        <h4>🎯 关键数据</h4>
+                        <ul>
+                            <li><strong>海拔：</strong>457米</li>
+                            <li><strong>气温：</strong>-20°C到-30°C</li>
+                            <li><strong>赛道：</strong>10圈环形赛道</li>
+                            <li><strong>装备：</strong>波哥的钢钉跑鞋</li>
+                            <li><strong>挑战：</strong>极地严寒、大风、初次体验</li>
+                        </ul>
+                        
+                        <h4>🔚 赛后回程</h4>
+                        <p>结束后回到营地，冻僵了。因为起了大风。两个小时后飞，因为还有两个孩子没跑完，一个是甄17姑娘，她要把这个作为18生日礼物。我们最后一站的时间就是她的生日。还有一个是倪16，倪哥的儿子。</p>
+                    `
+                },
+                en: {
+                    title: '🏔️ Antarctica Marathon - First Encounter',
+                    content: `
+                        <h3>Stop 1: Antarctica | Rank: 41 | Time: ~6 hours</h3>
+                        
+                        <h4>🌅 Early Morning Start</h4>
+                        <p>Woke up at 4:20 AM on January 31st, gathering in the lobby at 5 AM. Charles even provided wake-up service. Then bus to airport, customs, etc., and then we saw our cargo plane. Since it was my first time on a cargo plane, I forgot about all the plane's shabby conditions and only felt the sense of adventure.</p>
+                        
+                        <h4>❄️ Antarctic Challenge</h4>
+                        <p>I took off my windbreaker jacket and pants, thinking they weren't necessary, then officially started the race. Antarctica was 10 laps, and I was quickly lapped. My shoes were good - given by a friend (Brother Bo) who had run WMC777 before. The soles even had some steel spikes, so the grip was very secure. Many people fell, but I didn't.</p>
+                        
+                        <h4>🤝 Crossing the Finish Line with Magen</h4>
+                        <p>On the last lap, we chatted. We both had January birthdays that just passed, and she believed this would be our lucky year. At the final moment, she wanted to walk, but I said no. The last 300 meters - let's cross the finish line together! After the finish line, I looked back and saw her vomiting by the trash can. I felt like I might have done something wrong.</p>
+                        
+                        <h4>🌪️ Antarctic Cold Test</h4>
+                        <p>In the second half of Antarctica, I really wanted to walk and did walk for a few minutes. But I froze solid and had to run. At this point, I realized not wearing the windbreaker was a bad idea because the wind picked up, whistling through my clothes. The good news was that I had to keep running. On the last lap with victory in sight, I tried hard to look at the surrounding scenery and watch the sunset (though it would never set) to remember this was Antarctica.</p>
+                        
+                        <h4>🎯 Key Data</h4>
+                        <ul>
+                            <li><strong>Altitude:</strong> 457 meters</li>
+                            <li><strong>Temperature:</strong> -20°C to -30°C</li>
+                            <li><strong>Course:</strong> 10-lap loop course</li>
+                            <li><strong>Equipment:</strong> Brother Bo's spiked running shoes</li>
+                            <li><strong>Challenges:</strong> Polar cold, strong winds, first-time experience</li>
+                        </ul>
+                        
+                        <h4>🔚 Post-Race Return</h4>
+                        <p>After finishing, back to the camp, frozen solid. Because strong winds had picked up. Two hours later we flew, because there were still two kids who hadn't finished, one was Zhen 17, who wanted to make this her 18th birthday gift. The time of our last stop was her birthday. The other was Ni 16, Ni's son.</p>
+                    `
+                }
+            },
+            africa: {
+                zh: {
+                    title: '🌍 非洲马拉松 - 热浪来袭',
+                    content: `
+                        <h3>第二站：非洲开普敦 | 排名：25 | 时间：5小时17分</h3>
+                        
+                        <h4>🌅 回到开普敦</h4>
+                        <p>我们又回到了cape town。不到12个小时，就要跑另外一场了。大家都没睡，彼此鼓励，就当跑个84km了。去酒店的大巴上，我坐在何律师的旁边。何律师的坏毛病和我一样，比如咬指甲，比如咽炎，我们分享只有自己才听得懂的笑话。</p>
+                        
+                        <h4>☀️ 酷热无风的挑战</h4>
+                        <p>很热无风，我630配速开始。我是打算跑慢点的，为了以后储备力量。过了一会，看到ronger超过了我，配速也很好，我就跟她了。ronger我初见以为很小还叫人家年轻小姑凉，结果打脸了，人家比我还大点点，却比我跑得快很多看着比我年轻20岁。</p>
+                        
+                        <h4>🏃‍♂️ 独自奔跑</h4>
+                        <p>我一个人默默的跑，发现这次我竟然超了不少人。很多熟悉的人都貌似不适应这里的天气。红牛美国男孩（组织者ted的儿子）被我超了。Stéphane被我超了，甚至加拿大兄弟也很疲态。</p>
+                        
+                        <h4>😊 Lisa的微笑</h4>
+                        <p>最后三圈，我总能看到lisa。她是美国老太太，有一段路我们会迎面错过。因为配速差不多，所以每次都在相同地点相遇，每次她都给我一个big smile。我太喜欢这个了，为了这个我也不能降速度太多。</p>
+                        
+                        <h4>🌡️ 中暑的代价</h4>
+                        <p>这个赛道是六圈，全程没有阴凉，大太阳照。赛后很多人中暑了，洛杉矶陈，selina，还有华盛顿megan都中暑了。还学了知识，中暑后多穿衣服只喝温水。我还好，我每个水点都喝三杯。但是太阳真大啊，我也想补防晒，但是出汗多补不上啊。赛后我的鼻子，肩膀和小腿肚都有点晒伤。</p>
+                        
+                        <h4>⚡ Charles的神奇按摩</h4>
+                        <p>最大惊喜来了，新加坡最大跑团的会长charles，给我做了恢复按摩。站在我身上，我龇牙咧嘴一身冷汗。然后发现，腿正常了。刚跑完我下楼都得扶楼梯，按摩后竟然好了！这是整个旅程的转折点。</p>
+                        
+                        <h4>🎯 赛道数据</h4>
+                        <ul>
+                            <li><strong>赛道：</strong>6圈环形赛道</li>
+                            <li><strong>天气：</strong>酷热无风，全程暴晒</li>
+                            <li><strong>配速策略：</strong>630开始，后程逐渐降速</li>
+                            <li><strong>补给：</strong>每个水点喝三杯</li>
+                            <li><strong>挑战：</strong>高温暴晒、无阴凉区域</li>
+                        </ul>
+                    `
+                },
+                en: {
+                    title: '🌍 Africa Marathon - Heat Wave',
+                    content: `
+                        <h3>Stop 2: Cape Town, Africa | Rank: 25 | Time: 5:17</h3>
+                        
+                        <h4>🌅 Back to Cape Town</h4>
+                        <p>We were back in Cape Town. Less than 12 hours later, we had to run another one. Everyone didn't sleep, encouraging each other, thinking of it as just running 84km. On the bus to the hotel, I sat next to Lawyer He. Lawyer He had the same bad habits as me, like biting nails and pharyngitis, we shared jokes only we could understand.</p>
+                        
+                        <h4>☀️ Hot and Windless Challenge</h4>
+                        <p>It was very hot with no wind, I started at 6:30 pace. I planned to run slowly to save energy for later. After a while, I saw Ronger pass me with good pace, so I followed her. When I first met Ronger, I thought she was young and called her a young girl, but I was proven wrong - she was a bit older than me yet ran much faster and looked 20 years younger.</p>
+                        
+                        <h4>🏃‍♂️ Running Alone</h4>
+                        <p>I ran quietly by myself and found that I actually passed quite a few people this time. Many familiar faces seemed not to adapt to the weather here. I passed the Red Bull American boy (organizer Ted's son). I passed Stéphane, even the Canadian brothers looked tired.</p>
+                        
+                        <h4>😊 Lisa's Smile</h4>
+                        <p>In the last three laps, I could always see Lisa. She was an American elderly lady, and there was a section where we would pass each other head-on. Because our paces were similar, we always met at the same spot, and each time she gave me a big smile. I loved this so much that I couldn't slow down too much just for this.</p>
+                        
+                        <h4>🌡️ The Price of Heat Stroke</h4>
+                        <p>This course was six laps with no shade throughout, under blazing sun. After the race, many people got heat stroke - LA Chen, Selina, and Washington Megan all got heat stroke. I learned that after heat stroke, you should wear more clothes and only drink warm water. I was fine because I drank three cups at every water station. But the sun was really strong, I wanted to reapply sunscreen but sweated too much to apply it properly. After the race, my nose, shoulders and calves were a bit sunburned.</p>
+                        
+                        <h4>⚡ Charles's Magical Massage</h4>
+                        <p>The biggest surprise came - Charles, president of Singapore's largest running group, gave me a recovery massage. Standing on my body, I grimaced in pain and broke out in cold sweat. Then I discovered my legs were normal again. Right after finishing, I needed to hold the railing to go downstairs, but after the massage, I was fine! This was the turning point of the entire journey.</p>
+                        
+                        <h4>🎯 Course Data</h4>
+                        <ul>
+                            <li><strong>Course:</strong> 6-lap loop course</li>
+                            <li><strong>Weather:</strong> Hot and windless, full sun exposure</li>
+                            <li><strong>Pace Strategy:</strong> Started at 6:30, gradually slowed later</li>
+                            <li><strong>Hydration:</strong> Three cups at every water station</li>
+                            <li><strong>Challenges:</strong> High temperature, sun exposure, no shade areas</li>
+                        </ul>
+                    `
+                }
+            },
+            australia: {
+                zh: {
+                    title: '🇦🇺 澳洲马拉松 - 血脉觉醒',
+                    content: `
+                        <h3>第三站：澳洲珀斯 | 排名：18 | 时间：不到5小时</h3>
+                        
+                        <h4>🩸 血脉觉醒的时刻</h4>
+                        <p>我的成绩5小时之内了。排名18。我从来没想过会这样的成绩。charles给我按摩的时候说我的肌肉和何律师一样，适合跑步。我全程没有减速，一个速度从头到尾。我觉得也许我真的有跑步隐藏血脉，今天被赵西安觉醒了。</p>
+                        
+                        <h4>🌃 夜跑的开始</h4>
+                        <p>佩斯的赛道是四圈，因为是晚上9点开跑的，大家都需要头灯。我带了两个头灯，借了一个给顾安徽，他今日最后成绩华人第一。我觉得都是我的功劳，哈。</p>
+                        
+                        <h4>🏃‍♂️ 与赵西安的完美配合</h4>
+                        <p>前10km基本上就是各种大家超我的经历。然后第一圈后，西安赵开始带我跑了。他说他非常稳定在配速640-7，我也选择相信了他。然后开始了逆袭之路。后面32km，我的眼中心里都只有西安赵❤️，开始是伟岸的跑步衫后背，后面是他的裸背。虽然我期间也骂他无数回，因为他总偷偷提速，但是这次无比感激。</p>
+                        
+                        <h4>👥 华人聚会的温暖</h4>
+                        <p>很多华人来支持，我吃的包子有点多。给菲律宾的mench也分享了。都是亚洲人，要互相照顾。还有我的飞机邻居印度人smita，也要照顾。smita飞机landing的时候肩膀脱臼，竟然指导我帮她复位了，我自己都觉得不可思议。</p>
+                        
+                        <h4>🏁 尴尬的冲线</h4>
+                        <p>最后冲线的时候，我和赵西安很得意，得意的有点忘形了。ronger追上了，就邀请一起冲线，结果ronger两脚撒欢，感觉配速霎时间提到3，一个人冲了。估计她也尴尬了，我们三个愉快的补拍了三人官方冲线视频。</p>
+                        
+                        <h4>🎯 关键数据</h4>
+                        <ul>
+                            <li><strong>赛道：</strong>4圈环形赛道</li>
+                            <li><strong>开赛时间：</strong>晚上9点</li>
+                            <li><strong>配速：</strong>640-700全程稳定</li>
+                            <li><strong>装备：</strong>头灯必备</li>
+                            <li><strong>突破：</strong>个人最佳成绩</li>
+                            <li><strong>友谊：</strong>三人小火车雏形</li>
+                        </ul>
+                        
+                        <h4>✈️ 机场的思考</h4>
+                        <p>然后上大巴，我竟然又和飞机邻居ronger坐一起了，都没话说了。机场等的时候和becca聊了会。她很有意思，国际大神，她提到老公很擅长赚钱，总想让她休息，她不愿意。她喜欢的就是训练，励志演讲，慈善，比赛等。</p>
+                    `
+                },
+                en: {
+                    title: '🇦🇺 Australia Marathon - Bloodline Awakening',
+                    content: `
+                        <h3>Stop 3: Perth, Australia | Rank: 18 | Time: Under 5 hours</h3>
+                        
+                        <h4>🩸 The Moment of Bloodline Awakening</h4>
+                        <p>My result was under 5 hours. Rank 18. I never thought I would achieve such a result. When Charles massaged me, he said my muscles were like Lawyer He's, suitable for running. I didn't slow down throughout, maintaining one pace from start to finish. I think maybe I really have hidden running bloodline that was awakened by Zhao Xi'an today.</p>
+                        
+                        <h4>🌃 Start of the Night Run</h4>
+                        <p>Perth's course was four laps, starting at 9 PM, so everyone needed headlamps. I brought two headlamps and lent one to Gu Anhui, who achieved the best Chinese result today. I think it's all thanks to me, haha.</p>
+                        
+                        <h4>🏃‍♂️ Perfect Coordination with Zhao Xi'an</h4>
+                        <p>The first 10km was basically everyone passing me. Then after the first lap, Xi'an Zhao started pacing me. He said he was very stable at 6:40-7:00 pace, and I chose to trust him. Then began the comeback journey. For the next 32km, my eyes and heart were only on Xi'an Zhao ❤️, first his majestic running shirt back, then his bare back. Although I cursed him countless times because he would secretly increase pace, I was infinitely grateful this time.</p>
+                        
+                        <h4>👥 Warmth of Chinese Gathering</h4>
+                        <p>Many Chinese came to support, I ate too many baozi. I also shared with Filipino Mench. We're all Asians, we should take care of each other. Also my plane neighbor, Indian Smita, needed care too. When the plane landed, Smita's shoulder was dislocated, and she actually guided me to help her relocate it - I found it incredible myself.</p>
+                        
+                        <h4>🏁 Awkward Finish Line</h4>
+                        <p>At the final finish line, Zhao Xi'an and I were very proud, perhaps too carried away. Ronger caught up and we invited her to finish together, but Ronger suddenly sprinted, her pace instantly felt like it hit 3:00, and she finished alone. She probably felt awkward too, so the three of us happily re-shot an official finish line video.</p>
+                        
+                        <h4>🎯 Key Data</h4>
+                        <ul>
+                            <li><strong>Course:</strong> 4-lap loop course</li>
+                            <li><strong>Start Time:</strong> 9 PM</li>
+                            <li><strong>Pace:</strong> Stable 6:40-7:00 throughout</li>
+                            <li><strong>Equipment:</strong> Headlamps essential</li>
+                            <li><strong>Breakthrough:</strong> Personal best result</li>
+                            <li><strong>Friendship:</strong> Three-person train prototype</li>
+                        </ul>
+                        
+                        <h4>✈️ Airport Reflections</h4>
+                        <p>Then on the bus, I was sitting with my plane neighbor Ronger again, we had nothing to say. While waiting at the airport, I chatted with Becca. She was very interesting, an international star. She mentioned her husband was very good at making money and always wanted her to rest, but she didn't want to. What she liked was training, motivational speaking, charity, competitions, etc.</p>
+                    `
+                }
+            },
+            asia: {
+                zh: {
+                    title: '🏜️ 亚洲马拉松 - 打回原形',
+                    content: `
+                        <h3>第四站：亚洲迪拜 | 排名：34 | 时间：5小时26分</h3>
+                        
+                        <h4>😴 疲惫的开始</h4>
+                        <p>到达迪拜开始15km跟着赵西安，估计配速平均在630太累了。然后我决定不跟，勉强木有幸福。最后的排名是34，5小时26分钟。所以说，木有积累，木有奇迹。前面跑得好点了，不是因为血脉而是自己太努力了，然后自己的低跑量以及低质量训练就显现出了后果，it is fair enough。</p>
+                        
+                        <h4>🚶‍♂️ 走错路的教训</h4>
+                        <p>不跟的第一圈我就跑错路了，我看到阿新。他很悠闲，一手烟，一手手机。我hi后继续跑，过了一会了，奇迹发生了。他又跑到了我的前面，知道自己走错了，查下手表，多跑了2km。然后心态就不好了，走走停停，后面回复了巡航慢速跑，配速我直接降到了730，最后追上了顾安徽，然后就结束了。</p>
+                        
+                        <h4>🩸 顾安徽的血案</h4>
+                        <p>然后是顾安徽同学，昨天华人第一，今天最后我被我追上。问题是他穿了朋友定制的hightech碳板鞋签名款，然后脚都夹出血了，我们两个总结：没有倪哥的水平，就不要穿人家的鞋。</p>
+                        
+                        <h4>🤒 洛杉矶陈的困境</h4>
+                        <p>最不幸的洛杉矶陈肠胃出了问题，非常难受跑完特别坚定的说弃赛下场。好在4个小时后他改口说看情况，然后第二天说要半马了。大家分析是身体虚弱的时候的中暑后遗症。</p>
+                        
+                        <h4>🏟️ EXPO 2020的赛道</h4>
+                        <p>dubai是在expo跑，虽然我累了，但是不妨碍每次到终点时候看到的大屏幕（想起我的世贸天阶，想起我在新城国际的20年岁月)和听着音乐的刹那升华。</p>
+                        
+                        <h4>🏆 前两名的精彩对决</h4>
+                        <p>前两名还是那两个女生西班牙和日本。我第一次看到tomomi第一了，有段时间。然后西班牙又反超。然后赛后各种八卦中汇集：西班牙去了洗手间，然后日本第一，然后西班牙出了洗手间，又夺回第一。我想强调的是，这个第一的事情上，从头到尾就没有我们男生什么事情。</p>
+                        
+                        <h4>🎯 现实的教训</h4>
+                        <ul>
+                            <li><strong>现实检验：</strong>低跑量的后果显现</li>
+                            <li><strong>走错路：</strong>多跑2公里的代价</li>
+                            <li><strong>装备教训：</strong>不适合的鞋子致伤</li>
+                            <li><strong>心态影响：</strong>错误后的心理波动</li>
+                            <li><strong>配速策略：</strong>730巡航速度</li>
+                        </ul>
+                    `
+                },
+                en: {
+                    title: '🏜️ Asia Marathon - Reality Check',
+                    content: `
+                        <h3>Stop 4: Dubai, Asia | Rank: 34 | Time: 5:26</h3>
+                        
+                        <h4>😴 Exhausted Beginning</h4>
+                        <p>Arriving in Dubai, I followed Zhao Xi'an for the first 15km, the average pace was probably 6:30 which was too tiring. Then I decided not to follow, forced happiness brings no joy. The final ranking was 34, 5 hours 26 minutes. So as they say, no accumulation, no miracles. Running better earlier wasn't because of bloodline but because I pushed myself too hard, then my low mileage and low-quality training showed their consequences, it is fair enough.</p>
+                        
+                        <h4>🚶‍♂️ Wrong Turn Lesson</h4>
+                        <p>On the first lap after not following, I took a wrong turn. I saw A Xin. He was very relaxed, cigarette in one hand, phone in the other. I said hi and continued running. After a while, a miracle happened. He ran ahead of me again, and I realized I had gone wrong. Checking my watch, I had run an extra 2km. Then my mindset went bad, walking and stopping, later I resumed cruise slow running, directly dropping my pace to 7:30. Finally I caught up with Gu Anhui, and then it was over.</p>
+                        
+                        <h4>🩸 Gu Anhui's Blood Incident</h4>
+                        <p>Then there was classmate Gu Anhui, who was first among Chinese yesterday but was caught up by me today. The problem was he wore his friend's custom high-tech carbon plate signature shoes, and his feet bled from them. We both concluded: without Ni's skill level, don't wear other people's shoes.</p>
+                        
+                        <h4>🤒 LA Chen's Predicament</h4>
+                        <p>The most unfortunate was LA Chen who had stomach problems, very uncomfortable, and after finishing firmly said he would quit the next race. Fortunately, 4 hours later he changed his mind and said he'd see how it goes, then the next day said he'd do half marathon. Everyone analyzed it was heat stroke aftermath when the body was weak.</p>
+                        
+                        <h4>🏟️ EXPO 2020 Course</h4>
+                        <p>Dubai was run at the expo. Although I was tired, it didn't prevent me from seeing the big screen every time I reached the finish line (reminding me of my World Trade Tianjie, reminding me of my 20 years at New City International) and the momentary elevation from hearing the music.</p>
+                        
+                        <h4>🏆 Exciting Duel Between Top Two</h4>
+                        <p>The top two were still those two women, Spanish and Japanese. I saw Tomomi in first place for the first time, for a while. Then Spain overtook again. Then post-race gossip revealed: Spain went to the bathroom, then Japan took first, then Spain came out of the bathroom and regained first place. What I want to emphasize is that in this first place matter, us men had nothing to do with it from start to finish.</p>
+                        
+                        <h4>🎯 Lessons from Reality</h4>
+                        <ul>
+                            <li><strong>Reality Check:</strong> Consequences of low mileage showing</li>
+                            <li><strong>Wrong Turn:</strong> Cost of running extra 2km</li>
+                            <li><strong>Equipment Lesson:</strong> Injury from unsuitable shoes</li>
+                            <li><strong>Mindset Impact:</strong> Psychological fluctuation after mistakes</li>
+                            <li><strong>Pace Strategy:</strong> 7:30 cruise speed</li>
+                        </ul>
+                    `
+                }
+            },
+            europe: {
+                zh: {
+                    title: '🏁 欧洲马拉松 - Just Have Fun',
+                    content: `
+                        <h3>第五站：欧洲马德里 | 排名：27 | 时间：不到5小时</h3>
+                        
+                        <h4>🚂 三人小火车的正式成立</h4>
+                        <p>成绩是5小时以内，排名27，我感觉完成的很轻松，也很开心，今天认识了很多人。一圈不到，赵西安就赶上了，说他今天特累。得跟着我混了。我想，你也有今天啊，澳洲他拉爆了我，然后dubai被他的朋友拉爆了。没过多久，参加了kona的yuki也加入了我们。我们三人就组成了小分队，赵打头，我排尾。一个配速，直到结束。</p>
+                        
+                        <h4>🏎️ F1赛道的间歇跑</h4>
+                        <p>我们是在马德里的F1赛场跑步的，本来觉得很可怕。因为要爬升500米，跑了第一圈后发现很舒服的。出发没多久就一个坡，我走。然后接着一个缓坡，我后面也走。然后缓下坡，然后急下坡。加速加速再加速。然后再上坡，我走，然后一路下坡跑到底。我觉得跑的不是马拉松，而是间歇跑训练。</p>
+                        
+                        <h4>💪 钢铁般的意志</h4>
+                        <p>期间我们以良好的精神面貌，稳定的低配速，钢铁般的意志，哈哈，吓到了很多人。因为一旦被我们超了，就没有机会了，我们不降速！期间就包括ronger，一见到我们接近，就兔子受惊样子吓跑了。</p>
+                        
+                        <h4>🥶 马德里的严寒</h4>
+                        <p>马德里非常冷，组委会竟然没有吃的准备。中国人因为有当地华侨的支持，送了很多东西吃。我们酒足饭饱后很多外国人都来讨吃的了真心是理解的因为跑的辛苦天气又冷没有吃的是要命的。更可怕的是没有热水许北京的电热水壶救人无数最有价值器具。</p>
+                        
+                        <h4>🍜 中国补给站的温暖</h4>
+                        <p>吃的多的有铁人记录tony他还吃了冷的午餐肉法国三人组长得像梅西的南美人和dubai二人组还有tomomi。以及更多脸熟但是叫不上名字的人。真是吃人嘴短啊第二天的跑道很多人和我打招呼。</p>
+                        
+                        <h4>🤝 最后的携手冲线</h4>
+                        <p>最后一个lap的时候，我和yuki都累了都有点降速，让赵西安先跑。赵选择和我呢一起慢跑冲线。最后30米，有个不识趣的美国人硬在我们后面加速超我们，yuki没有力气冲刺了，我和赵也就很自然的放弃了一个名次，真心是个好团队，最后携手冲线。</p>
+                        
+                        <h4>🎯 马德里数据</h4>
+                        <ul>
+                            <li><strong>赛道：</strong>F1赛道，爬升500米</li>
+                            <li><strong>策略：</strong>上坡走，下坡跑</li>
+                            <li><strong>团队：</strong>三人小火车正式成立</li>
+                            <li><strong>天气：</strong>严寒，需要热水壶</li>
+                            <li><strong>补给：</strong>中国华侨支持</li>
+                        </ul>
+                    `
+                },
+                en: {
+                    title: '🏁 Europe Marathon - Just Have Fun',
+                    content: `
+                        <h3>Stop 5: Madrid, Europe | Rank: 27 | Time: Under 5 hours</h3>
+                        
+                        <h4>🚂 Official Formation of Three-Person Train</h4>
+                        <p>The result was under 5 hours, rank 27. I felt it was completed easily and happily, and I met many people today. Less than one lap in, Zhao Xi'an caught up, saying he was particularly tired today. He needed to stick with me. I thought, you have your day too - in Australia he pulled me along, then in Dubai he was pulled along by his friends. Not long after, Yuki who had participated in Kona also joined us. The three of us formed a small team, Zhao leading, me at the rear. One pace, until the end.</p>
+                        
+                        <h4>🏎️ F1 Circuit Interval Training</h4>
+                        <p>We were running on Madrid's F1 circuit, which I initially thought would be scary. Because there was 500m elevation gain, but after running the first lap I found it quite comfortable. Shortly after starting there was a hill, I walked. Then a gradual slope, I walked later too. Then gradual downhill, then steep downhill. Accelerate, accelerate, accelerate again. Then uphill again, I walked, then ran all the way down. I felt like I wasn't running a marathon but doing interval training.</p>
+                        
+                        <h4>💪 Iron Will</h4>
+                        <p>During this time, with our good spirit, stable low pace, and iron will, haha, we scared many people. Because once we passed someone, they had no chance - we didn't slow down! This included Ronger, who would run away like a startled rabbit whenever she saw us approaching.</p>
+                        
+                        <h4>🥶 Madrid's Cold</h4>
+                        <p>Madrid was very cold, and the organizers surprisingly had no food prepared. The Chinese had support from local overseas Chinese who brought lots of food. After we were well-fed, many foreigners came asking for food, which was understandable because running was hard, the weather was cold, and having no food was life-threatening. Even worse was no hot water - Xu Beijing's electric kettle saved countless people, the most valuable equipment.</p>
+                        
+                        <h4>🍜 Warmth of Chinese Aid Station</h4>
+                        <p>Those who ate a lot included record-holding Tony who even ate cold lunch meat, the French trio, the South American who looked like Messi, the Dubai duo, and Tomomi. Plus many more familiar faces whose names I couldn't remember. Really, eating someone's food makes you indebted - the next day on the track many people greeted me.</p>
+                        
+                        <h4>🤝 Final Hand-in-Hand Finish</h4>
+                        <p>On the last lap, Yuki and I were both tired and slowing down, letting Zhao Xi'an go ahead. Zhao chose to jog slowly with us to the finish. In the last 30 meters, an inconsiderate American suddenly accelerated behind us to pass us. Yuki had no energy to sprint, so Zhao and I naturally gave up one ranking position. It was truly a good team, finishing hand-in-hand.</p>
+                        
+                        <h4>🎯 Madrid Data</h4>
+                        <ul>
+                            <li><strong>Course:</strong> F1 circuit, 500m elevation gain</li>
+                            <li><strong>Strategy:</strong> Walk uphill, run downhill</li>
+                            <li><strong>Team:</strong> Three-person train officially formed</li>
+                            <li><strong>Weather:</strong> Freezing cold, needed electric kettle</li>
+                            <li><strong>Support:</strong> Chinese overseas community assistance</li>
+                        </ul>
+                    `
+                }
+            },
+            southamerica: {
+                zh: {
+                    title: '🌴 南美洲马拉松 - 精疲力尽',
+                    content: `
+                        <h3>第六站：南美洲福塔雷萨 | 排名：23 | 时间：5小时37分</h3>
+                        
+                        <h4>😴 累积的疲惫</h4>
+                        <p>睡眠时间是不够的，越往后面越明显。每天的流程基本就是下飞机，过海关，行李和人大巴，到比赛地，然后整理准备，然后开赛，然后洗澡和收拾行李，然后行李和人上大巴，然后过海关和上飞机，去下一个目的地。</p>
+                        
+                        <p>早上醒来，就觉得累，精神不济，腿部和脚踝酸痛。我开始思考是否今天要少跑多走了。哼哼唧唧的下飞机，过关，上大巴，大巴上一个人睡觉，真心累了。</p>
+                        
+                        <h4>🌊 三重打击的福塔雷萨</h4>
+                        <p>Fortaleza具备了所有马拉松的缺点，高温，暴晒，以及潮湿。每个人都很挣扎。开始我还有心情看周边的各种海滨美女，到了后面累极了，看谁都像终点站。</p>
+                        
+                        <h4>🚂 永恒三人组的自然组队</h4>
+                        <p>然后倒计时321起跑，我蔫蔫的。突然，左边窜出赵西安，右边跳出yuki，完全就没有事先商量的又组队了。然后就结束了，我们三人战队的成绩是5小时37分，我排名23。话说，这个系统对我很不友好，每次都是3人携手冲线，排名我总是最后。不然我就是21了。歧视我。</p>
+                        
+                        <h4>🏥 Selina的坚韧</h4>
+                        <p>照例charles照顾大家，像个大家长一样。selina跑完后看队医，刚好坐在我旁边。队医叮嘱她有可能骨裂，所以明天需要包扎下，然后尽快去医院看。selina也答应的很好，我还嘱咐她了几次别跑多走，但是第二天的迈阿密她还是跑了，我也真心理解，60岁的selina太让我佩服和尊重了。</p>
+                        
+                        <h4>✈️ 与Mench的深入交流</h4>
+                        <p>去机场的大巴，mench坐在了我旁边，没想到两个人很快就适应了对方的口音，都飞速的输出了。一个巴士行程，基本都互相了解了。她的家庭情况事业情况个性等等，她老公会来迈阿密接她。她真是性情中人，charles给我说最后一场他，她抱着他哇哇大哭，就是觉得charles特别照顾她。我也不拆穿charles，他就是想招募个新加坡跑团会员而已。</p>
+                        
+                        <h4>🎯 福塔雷萨数据</h4>
+                        <ul>
+                            <li><strong>挑战：</strong>高温、暴晒、潮湿三重打击</li>
+                            <li><strong>身体状态：</strong>腿部脚踝酸痛，精神不济</li>
+                            <li><strong>睡眠：</strong>严重不足，累积疲劳</li>
+                            <li><strong>团队：</strong>三人组自然组队，默契十足</li>
+                            <li><strong>坚持：</strong>Selina可能骨裂仍坚持</li>
+                        </ul>
+                    `
+                },
+                en: {
+                    title: '🌴 South America Marathon - Exhausted',
+                    content: `
+                        <h3>Stop 6: Fortaleza, South America | Rank: 23 | Time: 5:37</h3>
+                        
+                        <h4>😴 Accumulated Fatigue</h4>
+                        <p>Sleep time was insufficient, becoming more obvious as we went on. The daily routine was basically: get off plane, customs, luggage and people to bus, to race venue, then organize and prepare, then race start, then shower and pack luggage, then luggage and people on bus, then customs and board plane, to next destination.</p>
+                        
+                        <p>Waking up in the morning, I felt tired, low energy, leg and ankle pain. I started thinking whether I should run less and walk more today. Groaning as I got off the plane, went through customs, boarded the bus, sleeping alone on the bus, truly exhausted.</p>
+                        
+                        <h4>🌊 Fortaleza's Triple Threat</h4>
+                        <p>Fortaleza had all the disadvantages of marathons: high temperature, blazing sun, and humidity. Everyone was struggling. At the beginning I still had the mood to look at various seaside beauties around, but later I was extremely tired and everyone looked like a finish line.</p>
+                        
+                        <h4>🚂 Natural Teaming of the Eternal Trio</h4>
+                        <p>Then countdown 3-2-1 start, I was listless. Suddenly, Zhao Xi'an jumped out on the left, Yuki popped up on the right, we teamed up again without any prior discussion. Then it was over, our three-person team's result was 5 hours 37 minutes, I ranked 23. By the way, this system is very unfriendly to me, every time we finish hand-in-hand, my ranking is always last. Otherwise I would be 21st. Discriminating against me.</p>
+                        
+                        <h4>🏥 Selina's Resilience</h4>
+                        <p>As usual, Charles took care of everyone like a patriarch. After finishing, Selina went to see the team doctor, sitting right next to me. The doctor warned her of possible bone fracture, so she needed bandaging tomorrow and should see a hospital as soon as possible. Selina agreed readily, and I reminded her several times to walk more and run less, but the next day in Miami she still ran. I truly understand - 60-year-old Selina earned my immense admiration and respect.</p>
+                        
+                        <h4>✈️ Deep Exchange with Mench</h4>
+                        <p>On the bus to the airport, Mench sat next to me. Unexpectedly, we quickly adapted to each other's accents and both spoke rapidly. During one bus journey, we basically understood each other completely. Her family situation, career situation, personality, etc. Her husband would come to Miami to pick her up. She was truly an emotional person - Charles told me in the last race, she hugged him and cried, feeling Charles took special care of her. I didn't expose Charles - he just wanted to recruit a Singapore running group member.</p>
+                        
+                        <h4>🎯 Fortaleza Data</h4>
+                        <ul>
+                            <li><strong>Challenges:</strong> Triple threat of heat, sun exposure, humidity</li>
+                            <li><strong>Physical State:</strong> Leg and ankle pain, low energy</li>
+                            <li><strong>Sleep:</strong> Severely insufficient, accumulated fatigue</li>
+                            <li><strong>Team:</strong> Trio naturally teamed up with perfect understanding</li>
+                            <li><strong>Perseverance:</strong> Selina continued despite possible bone fracture</li>
+                        </ul>
+                    `
+                }
+            },
+            northamerica: {
+                zh: {
+                    title: '🏖️ 北美洲马拉松 - 离别',
+                    content: `
+                        <h3>第七站：北美洲迈阿密 | 排名：25 | 时间：不到5小时</h3>
+                        
+                        <h4>👋 离别的开始</h4>
+                        <p>大家都意识到这是最后一场。因为结束后大家直接离开，并没有什么仪式。所以出了海关，等行李的时候，很多人都开始合影留念了。我和tomomi合影，小菇凉，呃，有没有辣么小，真心让我佩服，辣么努力的跑步，跑姿特力量，西班牙estefania有个团队支持，tomomi只有自己，赛后要行李，要直播，要恢复，英文还差。</p>
+                        
+                        <h4>🌙 凌晨1点的开赛</h4>
+                        <p>三人小分队已经习惯组队了。我们的开赛时间是凌晨1点，所以天气很好。顺着海滩跑，但是也看不见海滩，只有路灯。我看到tough guy有3个家人陪跑，我特别替他高兴。我看到laura了，她每次都是赛事最后一名，一个人孤独的走着。这次她也有个女朋友陪跑，至少也不孤独了。jackie的12岁女儿真棒，第七站了半马竟然2小时20多分完成了，都超了我们3人组。</p>
+                        
+                        <h4>🏆 Tomomi的翻盘夺冠</h4>
+                        <p>最近2站，都是estefania和tomomi第一和第二，最后一战，tomomi竟然翻盘了，sardar第二，estefania竟然第七了，但是总成绩还是第一。Antonio第五了。吃瓜群众有人认为是昨天巴西跑太猛，恢复不了，有人（我）认为生病了，因为我在大巴和几场都看到她裹毯子坐着。</p>
+                        
+                        <h4>🏃‍♂️ 赵西安的折返跑</h4>
+                        <p>最后的10km的时候，我和yuki的体能耗的差不多了。只要赵西安超了配速640，我们就跟不上了。可怜的赵同学竟然一个人没事玩折返跑了，真是个又有团队精神同时对自己有要求的好孩子。最后3km的时候，yuki竟然开始提速了，提到了530，我以为她终于要疯狂一把，忘记自己说了3天的身体虚弱的时候不要高配速，容易受伤，最后的1km她还是回复了理智。</p>
+                        
+                        <h4>🎭 对Yuki的深层理解</h4>
+                        <p>因为最近的3场一直是和赵西安还有yuki跑，而yuki就在我前面。所以对yuki的了解越来越多了。yuki同学说话保守，很随意的样子，但是行为确是疯狂的。一边给我说生活要随意，不要push自己，然后自己去了kona，一边给我说速度不要太快，安全第一，然后自己学了赛车，一边给我自己玩什么都不行，然后我发现她最弱的跑步都比我强，写到这里我突然悠然而生了一种领悟，她就是网上传说的那种说的最软的话，干的最硬的事儿的人。</p>
+                        
+                        <h4>💔 离别的不舍</h4>
+                        <p>我也没有遗憾，无伤完赛了。我航班定了当天的和第二天的，如果受伤，就第二天。然后我就当天飞了。赛后，我洗澡，吃饭，步行参加小聚会，取行李，uber机场，到了lounge睡觉，登机，飞回香港。</p>
+                        
+                        <h4>🎯 迈阿密数据</h4>
+                        <ul>
+                            <li><strong>开赛时间：</strong>凌晨1点</li>
+                            <li><strong>天气：</strong>宜人，海滨夜跑</li>
+                            <li><strong>亮点：</strong>Jackie 12岁女儿半马2:20</li>
+                            <li><strong>冠军：</strong>Tomomi翻盘夺冠</li>
+                            <li><strong>团队精神：</strong>赵西安折返跑照顾队友</li>
+                            <li><strong>完美收官：</strong>无伤完赛</li>
+                        </ul>
+                    `
+                },
+                en: {
+                    title: '🏖️ North America Marathon - Farewell',
+                    content: `
+                        <h3>Stop 7: Miami, North America | Rank: 25 | Time: Under 5 hours</h3>
+                        
+                        <h4>👋 Beginning of Farewell</h4>
+                        <p>Everyone realized this was the last race. Because everyone would leave directly after finishing, there was no ceremony. So after customs, while waiting for luggage, many people started taking commemorative photos. I took photos with Tomomi - little girl, well, maybe not that little, I truly admired her, running so hard with such powerful form. Spanish Estefania had team support, but Tomomi was alone, having to handle luggage, livestreaming, recovery after races, and her English wasn't good either.</p>
+                        
+                        <h4>🌙 1 AM Start</h4>
+                        <p>The three-person team was used to teaming up. Our start time was 1 AM, so the weather was nice. Running along the beach, but couldn't see the beach, only streetlights. I saw Tough Guy had 3 family members pacing him, which made me especially happy for him. I saw Laura, who was always last in every race, walking alone. This time she also had a female friend pacing her, at least she wasn't lonely. Jackie's 12-year-old daughter was amazing - in the seventh stop, her half marathon was completed in over 2:20, even faster than our three-person group.</p>
+                        
+                        <h4>🏆 Tomomi's Comeback Victory</h4>
+                        <p>In the recent 2 stops, it was always Estefania and Tomomi first and second. In the final battle, Tomomi actually made a comeback, Sardar second, Estefania surprisingly seventh, but still first overall. Antonio was fifth. Spectators thought it was because she ran too hard in Brazil yesterday and couldn't recover, some people (me) thought she was sick because I saw her sitting wrapped in blankets on the bus and in several races.</p>
+                        
+                        <h4>🏃‍♂️ Zhao Xi'an's Back-and-Forth Running</h4>
+                        <p>In the last 10km, Yuki and I were about exhausted. As long as Zhao Xi'an exceeded 6:40 pace, we couldn't keep up. Poor classmate Zhao actually had nothing to do and played back-and-forth running alone - truly a good kid with both team spirit and self-requirements. In the last 3km, Yuki actually started speeding up to 5:30. I thought she was finally going crazy, forgetting what she had said for 3 days about not going high pace when the body is weak because it's easy to get injured. In the last 1km she still returned to rationality.</p>
+                        
+                        <h4>🎭 Deep Understanding of Yuki</h4>
+                        <p>Because I had been running with Zhao Xi'an and Yuki for the recent 3 races, with Yuki right in front of me, I understood Yuki more and more. Yuki spoke conservatively, seemed very casual, but her actions were actually crazy. On one hand telling me life should be casual, don't push yourself, then going to Kona herself; on one hand telling me not to go too fast, safety first, then learning racing herself; on one hand telling me she's not good at anything, then I discovered her weakest skill - running - was still stronger than mine. Writing this, I suddenly had a realization - she's the legendary type who speaks the softest words but does the hardest things.</p>
+                        
+                        <h4>💔 Reluctant Farewell</h4>
+                        <p>I had no regrets either, finishing injury-free. I had flights booked for both that day and the next day - if injured, I'd take the next day's flight. Then I flew that day. After the race, I showered, ate, walked to attend a small gathering, got luggage, Uber to airport, slept in the lounge, boarded, and flew back to Hong Kong.</p>
+                        
+                        <h4>🎯 Miami Data</h4>
+                        <ul>
+                            <li><strong>Start Time:</strong> 1 AM</li>
+                            <li><strong>Weather:</strong> Pleasant, beachside night run</li>
+                            <li><strong>Highlight:</strong> Jackie's 12-year-old daughter half marathon in 2:20</li>
+                            <li><strong>Champion:</strong> Tomomi's comeback victory</li>
+                            <li><strong>Team Spirit:</strong> Zhao Xi'an's back-and-forth running caring for teammates</li>
+                            <li><strong>Perfect Ending:</strong> Injury-free completion</li>
+                        </ul>
+                    `
+                }
+            }
+        };
+
+        // 打开章节模态窗口
+        function openChapterModal(chapterKey) {
+            const modal = document.getElementById('chapterModal');
+            const modalContent = document.getElementById('modalContent');
+            const lang = currentLanguage;
+            
+            if (chapterDetails[chapterKey] && chapterDetails[chapterKey][lang]) {
+                const chapter = chapterDetails[chapterKey][lang];
+                modalContent.innerHTML = `
+                    <h2>${chapter.title}</h2>
+                    ${chapter.content}
+                `;
+                modal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        // 关闭章节模态窗口
+        function closeChapterModal() {
+            const modal = document.getElementById('chapterModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // 点击模态窗口外部关闭
+        window.onclick = function(event) {
+            const modal = document.getElementById('chapterModal');
+            if (event.target === modal) {
+                closeChapterModal();
             }
         }
 
@@ -1440,7 +2385,7 @@
                 this.nextBtn = document.querySelector('.carousel-next');
                 this.indicators = document.querySelectorAll('.carousel-indicator');
                 
-                if (!this.track) return; // 如果没有轮播元素就退出
+                if (!this.track) return;
                 
                 this.currentSlide = 0;
                 this.totalSlides = this.slides.length;
@@ -1451,44 +2396,34 @@
             }
             
             init() {
-                // 绑定事件
                 this.prevBtn.addEventListener('click', () => this.prevSlide());
                 this.nextBtn.addEventListener('click', () => this.nextSlide());
                 
-                // 指示器点击事件
                 this.indicators.forEach((indicator, index) => {
                     indicator.addEventListener('click', () => this.goToSlide(index));
                 });
                 
-                // 鼠标悬停暂停自动播放
                 const carousel = document.querySelector('.carousel-container');
                 carousel.addEventListener('mouseenter', () => this.pauseAutoPlay());
                 carousel.addEventListener('mouseleave', () => this.resumeAutoPlay());
                 
-                // 键盘支持
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'ArrowLeft') this.prevSlide();
                     if (e.key === 'ArrowRight') this.nextSlide();
                 });
                 
-                // 触摸支持
                 this.addTouchSupport();
-                
-                // 开始自动播放
                 this.startAutoPlay();
             }
             
             updateCarousel() {
-                // 更新轨道位置
                 const translateX = -this.currentSlide * 100;
                 this.track.style.transform = `translateX(${translateX}%)`;
                 
-                // 更新活动幻灯片
                 this.slides.forEach((slide, index) => {
                     slide.classList.toggle('active', index === this.currentSlide);
                 });
                 
-                // 更新指示器
                 this.indicators.forEach((indicator, index) => {
                     indicator.classList.toggle('active', index === this.currentSlide);
                 });
@@ -1513,7 +2448,7 @@
                 if (this.isAutoPlaying) {
                     this.autoPlayInterval = setInterval(() => {
                         this.nextSlide();
-                    }, 5000); // 5秒切换一次
+                    }, 5000);
                 }
             }
             
@@ -1535,33 +2470,30 @@
                 const carousel = document.querySelector('.carousel');
                 if (!carousel) return;
                 
-                // 触摸开始
                 carousel.addEventListener('touchstart', (e) => {
                     startX = e.touches[0].clientX;
                     isDragging = true;
                     this.pauseAutoPlay();
                 });
                 
-                // 触摸移动
                 carousel.addEventListener('touchmove', (e) => {
                     if (!isDragging) return;
                     e.preventDefault();
                     currentX = e.touches[0].clientX;
                 });
                 
-                // 触摸结束
                 carousel.addEventListener('touchend', () => {
                     if (!isDragging) return;
                     isDragging = false;
                     
                     const diffX = startX - currentX;
-                    const threshold = 50; // 最小滑动距离
+                    const threshold = 50;
                     
                     if (Math.abs(diffX) > threshold) {
                         if (diffX > 0) {
-                            this.nextSlide(); // 向左滑动，下一张
+                            this.nextSlide();
                         } else {
-                            this.prevSlide(); // 向右滑动，上一张
+                            this.prevSlide();
                         }
                     }
                     
@@ -1569,133 +2501,99 @@
                 });
             }
         }
-        
-        // 报名表单处理
-        function initRegistrationForm() {
-            const form = document.getElementById('registrationForm');
-            if (!form) return;
+
+        // 留言提交功能
+        function submitComment() {
+            const name = document.getElementById('commentName').value.trim();
+            const email = document.getElementById('commentEmail').value.trim();
+            const text = document.getElementById('commentText').value.trim();
             
-            const inputs = form.querySelectorAll('input, select, textarea');
+            if (!name || !text) {
+                showNotification(currentLanguage === 'zh' ? '请填写姓名和留言内容' : 'Please fill in name and comment content', 'error');
+                return;
+            }
             
-            // 添加表单验证样式
-            inputs.forEach(input => {
-                input.addEventListener('focus', function() {
-                    this.style.borderColor = 'var(--secondary-blue)';
-                    this.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
-                });
-                
-                input.addEventListener('blur', function() {
-                    if (this.value.trim() === '' && this.required) {
-                        this.style.borderColor = '#ef4444';
-                        this.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
-                    } else {
-                        this.style.borderColor = 'var(--gray-200)';
-                        this.style.boxShadow = 'none';
-                    }
-                });
-            });
+            // 创建新的留言
+            const commentsList = document.getElementById('comments-list');
+            const newComment = document.createElement('div');
+            newComment.className = 'comment-item';
             
-            // 处理表单提交
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // 收集表单数据
-                const formData = new FormData(form);
-                const data = {};
-                
-                for (let [key, value] of formData.entries()) {
-                    data[key] = value;
-                }
-                
-                // 显示提交按钮加载状态
-                const submitBtn = form.querySelector('button[type="submit"]');
-                const originalText = submitBtn.innerHTML;
-                submitBtn.innerHTML = '🔄 提交中...';
-                submitBtn.disabled = true;
-                submitBtn.style.opacity = '0.7';
-                
-                // 模拟发送邮件
-                setTimeout(() => {
-                    // 构建邮件内容
-                    const emailContent = formatEmailContent(data);
-                    console.log('报名信息已收集，准备发送到 fanrui@gmail.com:');
-                    console.log(emailContent);
-                    
-                    // 显示成功消息
-                    showSuccessMessage();
-                    form.reset();
-                    
-                    // 恢复按钮状态
-                    submitBtn.innerHTML = originalText;
-                    submitBtn.disabled = false;
-                    submitBtn.style.opacity = '1';
-                }, 2000);
-            });
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('zh-CN') + ' | ' + now.toLocaleDateString('en-US');
+            
+            newComment.innerHTML = `
+                <div class="comment-author">${name}</div>
+                <div class="comment-date">${dateStr}</div>
+                <div class="comment-text">${text}</div>
+            `;
+            
+            // 插入到现有留言之后
+            const firstComment = commentsList.querySelector('.comment-item');
+            if (firstComment) {
+                commentsList.insertBefore(newComment, firstComment.nextSibling);
+            } else {
+                commentsList.appendChild(newComment);
+            }
+            
+            // 清空表单
+            document.getElementById('commentName').value = '';
+            document.getElementById('commentEmail').value = '';
+            document.getElementById('commentText').value = '';
+            
+            // 显示成功消息
+            showNotification(currentLanguage === 'zh' ? '留言发布成功！' : 'Comment posted successfully!', 'success');
+            
+            // 滚动到新留言
+            newComment.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
-        
-        // 格式化邮件内容
-        function formatEmailContent(data) {
-            return `
-【WMC 777 马拉松赛事报名申请】
 
-=== 个人信息 ===
-姓名: ${data.fullName || '未填写'}
-邮箱: ${data.email || '未填写'}
-电话: ${data.phone || '未填写'}
-年龄: ${data.age || '未填写'}
-
-=== 跑步经历 ===
-跑步年限: ${data.runningYears || '未填写'}
-马拉松完赛次数: ${data.marathonCount || '未填写'}
-个人最佳成绩: ${data.bestTime || '未填写'}
-月跑量: ${data.monthlyVolume ? data.monthlyVolume + '公里' : '未填写'}
-
-=== 报名动机 ===
-${data.motivation || '未填写'}
-
-报名时间: ${new Date().toLocaleString('zh-CN')}
-            `.trim();
-        }
-        
-        // 显示成功消息
-        function showSuccessMessage() {
-            const message = document.createElement('div');
-            message.style.cssText = `
+        // 通知显示功能
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
                 position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: linear-gradient(135deg, var(--success), #34d399);
+                top: 20px;
+                right: 20px;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
                 color: white;
-                padding: 2rem 3rem;
-                border-radius: 16px;
-                box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3);
-                z-index: 10000;
-                text-align: center;
-                font-size: 1.1rem;
                 font-weight: 600;
-                animation: slideIn 0.3s ease-out;
+                z-index: 3000;
+                opacity: 0;
+                transform: translateY(-20px);
+                transition: all 0.3s ease;
+                max-width: 300px;
             `;
             
-            message.innerHTML = `
-                <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
-                <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">报名申请提交成功！</div>
-                <div style="font-size: 0.95rem; opacity: 0.9;">您的申请信息已收集完成</div>
-                <div style="font-size: 0.95rem; opacity: 0.9;">我们会在3个工作日内与您联系</div>
-            `;
+            if (type === 'success') {
+                notification.style.background = 'linear-gradient(135deg, #10b981, #34d399)';
+            } else if (type === 'error') {
+                notification.style.background = 'linear-gradient(135deg, #ef4444, #f87171)';
+            } else {
+                notification.style.background = 'linear-gradient(135deg, #3b82f6, #60a5fa)';
+            }
             
-            document.body.appendChild(message);
+            notification.textContent = message;
+            document.body.appendChild(notification);
             
+            // 动画显示
             setTimeout(() => {
-                message.style.animation = 'slideOut 0.3s ease-in forwards';
+                notification.style.opacity = '1';
+                notification.style.transform = 'translateY(0)';
+            }, 100);
+            
+            // 自动隐藏
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateY(-20px)';
                 setTimeout(() => {
-                    if (document.body.contains(message)) {
-                        document.body.removeChild(message);
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
                     }
                 }, 300);
-            }, 4000);
+            }, 3000);
         }
-        
+
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', () => {
             // 等待地图容器渲染完成后初始化地图
@@ -1708,8 +2606,15 @@ ${data.motivation || '未填写'}
                 }
             }, 1000);
             
+            // 初始化图表
+            setTimeout(() => {
+                if (document.getElementById('performanceChart')) {
+                    initPerformanceChart();
+                }
+            }, 1500);
+            
+            // 初始化轮播
             new Carousel();
-            initRegistrationForm();
         });
 
         // 平滑滚动
