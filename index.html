@@ -22,29 +22,46 @@
         }
         
         :root {
-            --primary-blue: #1e3a8a;
-            --secondary-blue: #3b82f6;
-            --accent-blue: #60a5fa;
-            --light-blue: #dbeafe;
-            --dark-blue: #1e40af;
-            --gold: #f59e0b;
-            --gold-light: #fbbf24;
-            --gray-50: #f9fafb;
-            --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
-            --gray-600: #4b5563;
-            --gray-700: #374151;
-            --gray-800: #1f2937;
-            --gray-900: #111827;
+            /* 运动活力风格配色系统 */
+            --primary: #FF6B35;        /* 活力橙 - 主色调 */
+            --primary-blue: #FF6B35;   /* 兼容原变量名 */
+            --secondary: #004E89;      /* 深海蓝 - 辅助色 */
+            --secondary-blue: #004E89; /* 兼容原变量名 */
+            --accent: #1A936F;         /* 森林绿 - 强调色 */
+            --accent-blue: #1A936F;    /* 兼容原变量名 */
+            --gold: #FFD23F;           /* 活力黄 - 金色 */
+            --gold-light: #FFD23F;     /* 兼容原变量名 */
+            --energy-red: #E63946;     /* 能量红 */
+            --sky-blue: #457B9D;       /* 天空蓝 */
+            --light-blue: #dbeafe;     /* 兼容原变量名 */
+            --dark-blue: #004E89;      /* 兼容原变量名 */
+            
+            /* 灰色系统 */
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
             --white: #ffffff;
-            --success: #10b981;
-            --warning: #f59e0b;
+            
+            /* 功能色 */
+            --success: #1A936F;
+            --warning: #FFD23F;
+            --error: #E63946;
+            
+            /* 渐变色系统 */
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #FF6B35 100%);
+            --hero-gradient: linear-gradient(135deg, #004E89 0%, #1A936F 50%, #FF6B35 100%);
+            --card-gradient: linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%);
+            --section-gradient: linear-gradient(135deg, rgba(255, 107, 53, 0.05) 0%, rgba(26, 147, 111, 0.05) 100%);
         }
         
         body {
             font-family: 'Inter', 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif;
             line-height: 1.6;
-            background: linear-gradient(135deg, var(--gray-50) 0%, var(--light-blue) 100%);
+            background: var(--bg-gradient);
             color: var(--gray-800);
             transition: all 0.3s ease;
         }
@@ -107,7 +124,7 @@
         header {
             text-align: center;
             padding: 4rem 1rem 3rem;
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            background: var(--hero-gradient);
             color: var(--white);
             position: relative;
             overflow: hidden;
@@ -974,13 +991,190 @@
         html {
             scroll-behavior: smooth;
         }
+        
+        /* 阅读进度条 */
+        .reading-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            z-index: 9999;
+            transition: width 0.25s ease;
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+        }
+        
+        /* 返回顶部按钮 */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+        }
+        
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .back-to-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
+        }
+        
+        /* 分享按钮 */
+        .share-fab {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(26, 147, 111, 0.3);
+        }
+        
+        .share-fab:hover {
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 8px 25px rgba(26, 147, 111, 0.4);
+        }
+        
+        /* 分享菜单 */
+        .share-menu {
+            position: fixed;
+            bottom: 90px;
+            left: 30px;
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 1001;
+            min-width: 200px;
+        }
+        
+        body.dark .share-menu {
+            background: var(--gray-800);
+            color: white;
+        }
+        
+        .share-menu.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .share-option {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            border: none;
+            width: 100%;
+            background: none;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+        
+        .share-option:hover {
+            background: var(--gray-100);
+        }
+        
+        body.dark .share-option:hover {
+            background: var(--gray-700);
+        }
+        
+        .share-option i {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+            width: 20px;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .back-to-top, .share-fab {
+                width: 45px;
+                height: 45px;
+                font-size: 16px;
+                bottom: 20px;
+            }
+            
+            .back-to-top {
+                right: 20px;
+            }
+            
+            .share-fab {
+                left: 20px;
+            }
+            
+            .share-menu {
+                left: 20px;
+                bottom: 75px;
+                min-width: 180px;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- 阅读进度条 -->
+    <div class="reading-progress" id="reading-progress"></div>
+    
     <!-- 语言切换器 -->
     <div class="language-switcher">
         <button onclick="switchLanguage('zh')" class="active" id="lang-zh">中文</button>
         <button onclick="switchLanguage('en')" id="lang-en">English</button>
+    </div>
+    
+    <!-- 返回顶部按钮 -->
+    <button class="back-to-top" id="back-to-top" aria-label="返回顶部" title="返回顶部">↑</button>
+    
+    <!-- 分享按钮 -->
+    <button class="share-fab" id="share-fab" aria-label="分享" title="分享">📤</button>
+    
+    <!-- 分享菜单 -->
+    <div class="share-menu" id="share-menu">
+        <button class="share-option" onclick="shareToWeChat()">
+            <span>💬</span>
+            <span data-zh="微信分享" data-en="WeChat">微信分享</span>
+        </button>
+        <button class="share-option" onclick="shareToWeibo()">
+            <span>🐦</span>
+            <span data-zh="微博分享" data-en="Weibo">微博分享</span>
+        </button>
+        <button class="share-option" onclick="shareToTwitter()">
+            <span>🐤</span>
+            <span data-zh="Twitter分享" data-en="Twitter">Twitter分享</span>
+        </button>
+        <button class="share-option" onclick="copyLink()">
+            <span>🔗</span>
+            <span data-zh="复制链接" data-en="Copy Link">复制链接</span>
+        </button>
     </div>
 
     <header>
@@ -2594,6 +2788,127 @@
             }, 3000);
         }
 
+        // 阅读进度条更新
+        function updateReadingProgress() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = (scrollTop / docHeight) * 100;
+            
+            const progressBar = document.getElementById('reading-progress');
+            if (progressBar) {
+                progressBar.style.width = scrollPercent + '%';
+            }
+        }
+
+        // 返回顶部按钮显示/隐藏
+        function updateBackToTop() {
+            const backToTopBtn = document.getElementById('back-to-top');
+            if (window.pageYOffset > 300) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+        }
+
+        // 返回顶部功能
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // 分享功能
+        let shareMenuVisible = false;
+
+        function toggleShareMenu() {
+            const shareMenu = document.getElementById('share-menu');
+            shareMenuVisible = !shareMenuVisible;
+            
+            if (shareMenuVisible) {
+                shareMenu.classList.add('visible');
+            } else {
+                shareMenu.classList.remove('visible');
+            }
+        }
+
+        // 分享到微信
+        function shareToWeChat() {
+            const title = currentLanguage === 'zh' ? 'Henry 的 WMC 777 - 七大洲马拉松挑战' : "Henry's WMC 777 - Seven Continents Marathon Challenge";
+            const url = window.location.href;
+            const desc = currentLanguage === 'zh' ? '六天七大洲七场马拉松的极限挑战' : 'Six Days, Seven Continents, Seven Marathons Challenge';
+            
+            // 微信分享链接（在微信内置浏览器中会自动调用分享API）
+            if (navigator.share) {
+                navigator.share({
+                    title: title,
+                    text: desc,
+                    url: url
+                });
+            } else {
+                copyLink();
+                showNotification(currentLanguage === 'zh' ? '链接已复制，请在微信中粘贴分享' : 'Link copied, paste and share in WeChat', 'success');
+            }
+            toggleShareMenu();
+        }
+
+        // 分享到微博
+        function shareToWeibo() {
+            const title = currentLanguage === 'zh' ? 'Henry 的 WMC 777 - 七大洲马拉松挑战' : "Henry's WMC 777 - Seven Continents Marathon Challenge";
+            const url = window.location.href;
+            const text = encodeURIComponent(`${title} ${url}`);
+            
+            window.open(`https://service.weibo.com/share/share.php?url=${encodeURIComponent(url)}&title=${text}`, '_blank');
+            toggleShareMenu();
+        }
+
+        // 分享到Twitter
+        function shareToTwitter() {
+            const title = currentLanguage === 'zh' ? 'Henry 的 WMC 777 - 七大洲马拉松挑战' : "Henry's WMC 777 - Seven Continents Marathon Challenge";
+            const url = window.location.href;
+            const text = encodeURIComponent(`${title} ${url}`);
+            
+            window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+            toggleShareMenu();
+        }
+
+        // 复制链接
+        async function copyLink() {
+            try {
+                await navigator.clipboard.writeText(window.location.href);
+                showNotification(currentLanguage === 'zh' ? '链接已复制到剪贴板！' : 'Link copied to clipboard!', 'success');
+            } catch (err) {
+                // 兼容性备选方案
+                const textArea = document.createElement('textarea');
+                textArea.value = window.location.href;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showNotification(currentLanguage === 'zh' ? '链接已复制到剪贴板！' : 'Link copied to clipboard!', 'success');
+            }
+            toggleShareMenu();
+        }
+
+        // 滚动事件监听
+        function handleScroll() {
+            updateReadingProgress();
+            updateBackToTop();
+        }
+
+        // 节流函数
+        function throttle(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', () => {
             // 等待地图容器渲染完成后初始化地图
@@ -2615,6 +2930,25 @@
             
             // 初始化轮播
             new Carousel();
+            
+            // 初始化新功能
+            const throttledScroll = throttle(handleScroll, 16); // 约60fps
+            window.addEventListener('scroll', throttledScroll);
+            
+            // 返回顶部按钮事件
+            document.getElementById('back-to-top').addEventListener('click', scrollToTop);
+            
+            // 分享按钮事件
+            document.getElementById('share-fab').addEventListener('click', toggleShareMenu);
+            
+            // 点击其他地方关闭分享菜单
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('#share-fab') && !e.target.closest('#share-menu')) {
+                    if (shareMenuVisible) {
+                        toggleShareMenu();
+                    }
+                }
+            });
         });
 
         // 平滑滚动
